@@ -1,0 +1,44 @@
+{
+  "volly-putra": {
+    "A": [
+      { "name": "Tim Harapan Jaya", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Tim Putra Mandiri", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Tim Garuda Muda", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Tim Bintang Timur", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 }
+    ],
+    "B": [
+      { "name": "Tim Rajawali FC", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Tim Sinar Utama", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Tim Persatuan Jaya", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Tim Karya Muda", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 }
+    ]
+  },
+  "volly-putri": {
+    "A": [
+      { "name": "SMPN 6 Alla", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Bala Batu", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Buntu Ampalla", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Garuda Muda", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 }
+    ],
+    "B": [
+      { "name": "Tim Melati Putih", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Tim Anggrek Biru", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Tim Kenanga Emas", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 },
+      { "name": "Tim Seruni Jaya", "played": 0, "won": 0, "lost": 0, "setsFor": 0, "setsAgainst": 0, "points": 0 }
+    ]
+  },
+  "sepak-bola-mini": {
+    "A": [
+      { "name": "Tim Elang Sakti", "played": 0, "won": 0, "lost": 0, "goalsFor": 0, "goalsAgainst": 0, "points": 0 },
+      { "name": "Tim Merpati FC", "played": 0, "won": 0, "lost": 0, "goalsFor": 0, "goalsAgainst": 0, "points": 0 },
+      { "name": "Tim Singa Muda", "played": 0, "won": 0, "lost": 0, "goalsFor": 0, "goalsAgainst": 0, "points": 0 },
+      { "name": "Tim Harimau FC", "played": 0, "won": 0, "lost": 0, "goalsFor": 0, "goalsAgainst": 0, "points": 0 }
+    ],
+    "B": [
+      { "name": "Tim Banteng Jaya", "played": 0, "won": 0, "lost": 0, "goalsFor": 0, "goalsAgainst": 0, "points": 0 },
+      { "name": "Tim Kuda Hitam", "played": 0, "won": 0, "lost": 0, "goalsFor": 0, "goalsAgainst": 0, "points": 0 },
+      { "name": "Tim Gajah Putih", "played": 0, "won": 0, "lost": 0, "goalsFor": 0, "goalsAgainst": 0, "points": 0 },
+      { "name": "Tim Buaya FC", "played": 0, "won": 0, "lost": 0, "goalsFor": 0, "goalsAgainst": 0, "points": 0 }
+    ]
+  }
+}
