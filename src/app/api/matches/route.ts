@@ -1,194 +1,121 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { neon } from '@neondatabase/serverless';
-import type { Match } from '@/types';
-import defaultMatchesData from '../../../../data/matches.json';
+import { getDb, initDatabase } from '@/lib/db';
 
-const neonDbUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+function rowToMatch(r: any) {
+  return {
+    id: r.id,
+    sport: r.sport,
+    phase: r.phase,
+    group: r.group_name,
+    round: r.round,
+    teamA: r.team_a,
+    teamB: r.team_b,
+    date: r.date,
+    time: r.time,
+    venue: r.venue,
+    status: r.status,
+    scoreA: r.score_a,
+    scoreB: r.score_b,
+    winner: r.winner,
+  };
+}
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
-
-const kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-
-function getInitialDefaultMatches(): Match[] {
+export async function GET(request: Request) {
   try {
-    const filePath = path.join(process.cwd(), 'data', 'matches.json');
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf8');
-      const parsed = JSON.parse(content);
-      if (parsed && Array.isArray(parsed.matches)) {
-        return parsed.matches;
-      }
-    }
-  } catch {
-    // fallback
+    const { searchParams } = new URL(request.url);
+    const sport = searchParams.get('sport');
+    const sql = getDb();
+    await initDatabase();
+
+    const rows = sport
+      ? await sql`SELECT * FROM matches WHERE sport = ${sport} ORDER BY date, time`
+      : await sql`SELECT * FROM matches ORDER BY date, time`;
+
+    return NextResponse.json(
+      { matches: rows.map(rowToMatch), source: 'neon-postgres' },
+      { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+    );
+  } catch (error) {
+    console.error('GET /api/matches error:', error);
+    return NextResponse.json({ error: 'Failed to fetch matches' }, { status: 500 });
   }
-  return defaultMatchesData.matches as Match[];
 }
 
-export async function GET() {
-  const defaultMatches = getInitialDefaultMatches();
-
-  // 1. PRIMARY: NEON SERVERLESS POSTGRES
-  if (neonDbUrl) {
-    try {
-      const sql = neon(neonDbUrl);
-      // Auto create table if not exists
-      await sql`CREATE TABLE IF NOT EXISTS app_state (id TEXT PRIMARY KEY, data JSONB);`;
-      const rows = await sql`SELECT data FROM app_state WHERE id = 'pr_matches';`;
-
-      if (rows && rows.length > 0 && rows[0].data) {
-        return NextResponse.json({ matches: rows[0].data, source: 'neon-postgres' }, {
-          headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
-        });
-      }
-
-      // If empty, auto-seed Neon Postgres
-      await sql`INSERT INTO app_state (id, data) VALUES ('pr_matches', ${JSON.stringify(defaultMatches)}) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data;`;
-      return NextResponse.json({ matches: defaultMatches, source: 'neon-postgres-seeded' }, {
-        headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
-      });
-    } catch (e) {
-      console.warn('Neon Postgres GET error:', e);
-    }
-  }
-
-  // 2. SECONDARY: SUPABASE POSTGRES
-  if (supabaseUrl && supabaseKey) {
-    try {
-      const res = await fetch(`${supabaseUrl}/rest/v1/app_state?id=eq.pr_matches&select=data`, {
-        headers: {
-          apikey: supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`,
-        },
-        cache: 'no-store',
-      });
-
-      if (res.ok) {
-        const rows = await res.json();
-        if (Array.isArray(rows) && rows.length > 0 && rows[0].data) {
-          return NextResponse.json({ matches: rows[0].data, source: 'supabase' }, {
-            headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
-          });
-        }
-
-        // Auto-seed Supabase
-        await fetch(`${supabaseUrl}/rest/v1/app_state`, {
-          method: 'POST',
-          headers: {
-            apikey: supabaseKey,
-            Authorization: `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-            Prefer: 'resolution=merge-duplicates',
-          },
-          body: JSON.stringify({ id: 'pr_matches', data: defaultMatches }),
-        });
-
-        return NextResponse.json({ matches: defaultMatches, source: 'supabase-seeded' }, {
-          headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
-        });
-      }
-    } catch (e) {
-      console.warn('Supabase GET error:', e);
-    }
-  }
-
-  // 3. TERTIARY: CLOUD KV (UPSTASH / VERCEL KV)
-  if (kvUrl && kvToken) {
-    try {
-      const res = await fetch(`${kvUrl}/get/pr_matches`, {
-        headers: { Authorization: `Bearer ${kvToken}` },
-        cache: 'no-store',
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.result) {
-          const matches = typeof data.result === 'string' ? JSON.parse(data.result) : data.result;
-          return NextResponse.json({ matches, source: 'upstash' }, {
-            headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
-          });
-        }
-      }
-    } catch (e) {
-      console.warn('Cloud KV GET error:', e);
-    }
-  }
-
-  // 4. FALLBACK: LOCAL FILE
-  return NextResponse.json({ matches: defaultMatches, source: 'default' }, {
-    headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
-  });
-}
-
+// POST: Batch upsert all matches (bulk save from admin)
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const matches: Match[] = body.matches;
-
+    const matches = body.matches;
     if (!Array.isArray(matches)) {
-      return NextResponse.json({ error: 'Invalid data format' }, { status: 400 });
+      return NextResponse.json({ error: 'matches array required' }, { status: 400 });
+    }
+    const sql = getDb();
+    await initDatabase();
+
+    for (const m of matches) {
+      await sql`
+        INSERT INTO matches (id, sport, phase, group_name, round, team_a, team_b, date, time, venue, status, score_a, score_b, winner)
+        VALUES (${m.id}, ${m.sport}, ${m.phase}, ${m.group || null}, ${m.round}, ${m.teamA}, ${m.teamB}, ${m.date}, ${m.time}, ${m.venue}, ${m.status}, ${m.scoreA ?? null}, ${m.scoreB ?? null}, ${m.winner ?? null})
+        ON CONFLICT (id) DO UPDATE SET
+          sport = EXCLUDED.sport, phase = EXCLUDED.phase, group_name = EXCLUDED.group_name,
+          round = EXCLUDED.round, team_a = EXCLUDED.team_a, team_b = EXCLUDED.team_b,
+          date = EXCLUDED.date, time = EXCLUDED.time, venue = EXCLUDED.venue,
+          status = EXCLUDED.status, score_a = EXCLUDED.score_a, score_b = EXCLUDED.score_b,
+          winner = EXCLUDED.winner
+      `;
     }
 
-    // 1. PRIMARY: SAVE TO NEON SERVERLESS POSTGRES
-    if (neonDbUrl) {
-      try {
-        const sql = neon(neonDbUrl);
-        await sql`CREATE TABLE IF NOT EXISTS app_state (id TEXT PRIMARY KEY, data JSONB);`;
-        await sql`INSERT INTO app_state (id, data) VALUES ('pr_matches', ${JSON.stringify(matches)}) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data;`;
-      } catch (e) {
-        console.error('Neon Postgres POST error:', e);
-      }
-    }
-
-    // 2. SECONDARY: SAVE TO SUPABASE POSTGRES
-    if (supabaseUrl && supabaseKey) {
-      try {
-        await fetch(`${supabaseUrl}/rest/v1/app_state`, {
-          method: 'POST',
-          headers: {
-            apikey: supabaseKey,
-            Authorization: `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-            Prefer: 'resolution=merge-duplicates',
-          },
-          body: JSON.stringify({ id: 'pr_matches', data: matches }),
-        });
-      } catch (e) {
-        console.error('Supabase POST error:', e);
-      }
-    }
-
-    // 3. TERTIARY: SAVE TO CLOUD KV (UPSTASH)
-    if (kvUrl && kvToken) {
-      try {
-        await fetch(`${kvUrl}/set/pr_matches`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${kvToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(JSON.stringify(matches)),
-        });
-      } catch (e) {
-        console.error('Cloud KV POST error:', e);
-      }
-    }
-
-    // 4. LOCAL FILE DISK FALLBACK
-    try {
-      const filePath = path.join(process.cwd(), 'data', 'matches.json');
-      fs.writeFileSync(filePath, JSON.stringify({ matches }, null, 2), 'utf8');
-    } catch {
-      // serverless read-only
-    }
-
-    return NextResponse.json({ success: true, message: 'Data pertandingan berhasil disimpan ke Postgres Database!' }, {
-      headers: { 'Cache-Control': 'no-store' },
-    });
+    return NextResponse.json({ success: true, message: 'Semua pertandingan berhasil disimpan ke Neon Postgres!' }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to save matches data' }, { status: 500 });
+    console.error('POST /api/matches error:', error);
+    return NextResponse.json({ error: 'Failed to save matches' }, { status: 500 });
+  }
+}
+
+// PUT: Add or update one single match
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const m = body.match;
+    if (!m || !m.id) {
+      return NextResponse.json({ error: 'match object with id required' }, { status: 400 });
+    }
+    const sql = getDb();
+    await initDatabase();
+
+    const id = m.id || `match-${Date.now()}`;
+    await sql`
+      INSERT INTO matches (id, sport, phase, group_name, round, team_a, team_b, date, time, venue, status, score_a, score_b, winner)
+      VALUES (${id}, ${m.sport}, ${m.phase}, ${m.group || null}, ${m.round}, ${m.teamA}, ${m.teamB}, ${m.date}, ${m.time}, ${m.venue}, ${m.status}, ${m.scoreA ?? null}, ${m.scoreB ?? null}, ${m.winner ?? null})
+      ON CONFLICT (id) DO UPDATE SET
+        sport = EXCLUDED.sport, phase = EXCLUDED.phase, group_name = EXCLUDED.group_name,
+        round = EXCLUDED.round, team_a = EXCLUDED.team_a, team_b = EXCLUDED.team_b,
+        date = EXCLUDED.date, time = EXCLUDED.time, venue = EXCLUDED.venue,
+        status = EXCLUDED.status, score_a = EXCLUDED.score_a, score_b = EXCLUDED.score_b,
+        winner = EXCLUDED.winner
+    `;
+
+    return NextResponse.json({ success: true, id, message: 'Pertandingan berhasil disimpan!' });
+  } catch (error) {
+    console.error('PUT /api/matches error:', error);
+    return NextResponse.json({ error: 'Failed to upsert match' }, { status: 500 });
+  }
+}
+
+// DELETE: Remove one match by id
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) {
+      return NextResponse.json({ error: 'id is required' }, { status: 400 });
+    }
+    const sql = getDb();
+    await sql`DELETE FROM matches WHERE id = ${id}`;
+
+    return NextResponse.json({ success: true, message: 'Pertandingan berhasil dihapus!' });
+  } catch (error) {
+    console.error('DELETE /api/matches error:', error);
+    return NextResponse.json({ error: 'Failed to delete match' }, { status: 500 });
   }
 }

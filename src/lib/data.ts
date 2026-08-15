@@ -1,59 +1,65 @@
-import eventData from '../../data/event.json';
-import matchesData from '../../data/matches.json';
-import teamsData from '../../data/teams.json';
 import type { EventData, Match, Team, Standing } from '@/types';
 
+// ─── Static fallback data (used only if DB unreachable) ────────────────────
+import staticEventData from '../../data/event.json';
+import staticTeamsData from '../../data/teams.json';
+import staticMatchesData from '../../data/matches.json';
+
+// ─── In-memory runtime cache (client-side) ──────────────────────────────────
+let runtimeMatchesCache: Match[] | null = null;
+let runtimeTeamsCache: Record<string, Team[]> | null = null;
+let runtimeEventCache: EventData | null = null;
+
 export function getEvent(): EventData {
-  return eventData as EventData;
+  if (runtimeEventCache) return runtimeEventCache;
+  return staticEventData as EventData;
 }
 
-// In-memory runtime cache for client-side fetched matches
-let runtimeMatchesCache: Match[] | null = null;
-
-// Clear stale localStorage on client init
-if (typeof window !== 'undefined') {
-  try {
-    localStorage.removeItem('pr_matches');
-  } catch {
-    // ignore
-  }
+export function setRuntimeEvent(ev: EventData) {
+  runtimeEventCache = ev;
 }
 
 export function getMatches(): Match[] {
-  // On Node.js Server side: ALWAYS read live from disk (data/matches.json)
-  if (typeof window === 'undefined') {
-    try {
-      const fs = require('fs');
-      const path = require('path');
-      const filePath = path.join(process.cwd(), 'data', 'matches.json');
-      if (fs.existsSync(filePath)) {
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        const parsed = JSON.parse(fileContent);
-        if (parsed && Array.isArray(parsed.matches)) {
-          return parsed.matches;
-        }
-      }
-    } catch (e) {
-      console.warn('Server read error for matches.json:', e);
-    }
-    return (matchesData as { matches: Match[] }).matches;
-  }
-
-  // On Client Browser side: return in-memory runtime cache if fetched, else fallback
-  if (runtimeMatchesCache && runtimeMatchesCache.length > 0) {
-    return runtimeMatchesCache;
-  }
-  return (matchesData as { matches: Match[] }).matches;
+  if (runtimeMatchesCache && runtimeMatchesCache.length > 0) return runtimeMatchesCache;
+  return (staticMatchesData as { matches: Match[] }).matches;
 }
 
 export function setRuntimeMatches(matches: Match[]) {
   runtimeMatchesCache = matches;
 }
 
-export async function fetchServerMatches(): Promise<Match[]> {
-  if (typeof window === 'undefined') {
-    return getMatches();
+export function getTeams(sport: string): Team[] {
+  if (runtimeTeamsCache && runtimeTeamsCache[sport]) return runtimeTeamsCache[sport];
+  const all = staticTeamsData as Record<string, Team[]>;
+  return all[sport] || [];
+}
+
+export function setRuntimeTeams(sport: string, teams: Team[]) {
+  if (!runtimeTeamsCache) runtimeTeamsCache = {};
+  runtimeTeamsCache[sport] = teams;
+}
+
+// ─── Async fetchers (fetch from API / Neon Postgres) ────────────────────────
+
+export async function fetchServerEvent(): Promise<EventData> {
+  if (typeof window === 'undefined') return staticEventData as EventData;
+  try {
+    const res = await fetch('/api/event?t=' + Date.now(), { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.name) {
+        setRuntimeEvent(data);
+        return data;
+      }
+    }
+  } catch (err) {
+    console.warn('fetchServerEvent failed:', err);
   }
+  return staticEventData as EventData;
+}
+
+export async function fetchServerMatches(): Promise<Match[]> {
+  if (typeof window === 'undefined') return getMatches();
   try {
     const res = await fetch('/api/matches?t=' + Date.now(), {
       cache: 'no-store',
@@ -67,9 +73,26 @@ export async function fetchServerMatches(): Promise<Match[]> {
       }
     }
   } catch (err) {
-    console.warn('Failed to fetch matches from server API, using local fallback:', err);
+    console.warn('fetchServerMatches failed:', err);
   }
   return getMatches();
+}
+
+export async function fetchServerTeams(sport: string): Promise<Team[]> {
+  if (typeof window === 'undefined') return getTeams(sport);
+  try {
+    const res = await fetch(`/api/teams?sport=${sport}&t=` + Date.now(), { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.teams && Array.isArray(data.teams)) {
+        setRuntimeTeams(sport, data.teams);
+        return data.teams;
+      }
+    }
+  } catch (err) {
+    console.warn('fetchServerTeams failed:', err);
+  }
+  return getTeams(sport);
 }
 
 export function saveMatches(matches: Match[]) {
@@ -79,14 +102,11 @@ export function saveMatches(matches: Match[]) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ matches }),
-    }).catch((err) => console.error('Save to server failed:', err));
+    }).catch((err) => console.error('Save to Neon failed:', err));
   }
 }
 
-export function getTeams(sport: string): Team[] {
-  const all = teamsData as Record<string, Team[]>;
-  return all[sport] || [];
-}
+// ─── Utility filters ─────────────────────────────────────────────────────────
 
 export function getMatchesBySport(sport: string): Match[] {
   return getMatches().filter((m) => m.sport === sport);
@@ -112,7 +132,6 @@ export function getTodayMatches(targetDate?: string): Match[] {
   const dateStr = targetDate || '2026-08-15';
   const matches = getMatches();
   const todayList = matches.filter((m) => m.date === dateStr);
-  
   if (todayList.length === 0) {
     const live = matches.filter((m) => m.status === 'live');
     if (live.length > 0) return live;
@@ -130,20 +149,10 @@ export function getStandings(sport: string): Record<string, Standing[]> {
 
   teams.forEach((t) => {
     const groupName = t.group || 'A';
-    if (!standingsMap[groupName]) {
-      standingsMap[groupName] = {};
-    }
+    if (!standingsMap[groupName]) standingsMap[groupName] = {};
     standingsMap[groupName][t.name] = {
-      name: t.name,
-      played: 0,
-      won: 0,
-      lost: 0,
-      draw: 0,
-      goalsFor: 0,
-      goalsAgainst: 0,
-      setsFor: 0,
-      setsAgainst: 0,
-      points: 0,
+      name: t.name, played: 0, won: 0, lost: 0, draw: 0,
+      goalsFor: 0, goalsAgainst: 0, setsFor: 0, setsAgainst: 0, points: 0,
     };
   });
 
@@ -157,7 +166,6 @@ export function getStandings(sport: string): Record<string, Standing[]> {
 
     const teamA = standingsMap[groupName][m.teamA];
     const teamB = standingsMap[groupName][m.teamB];
-
     if (!teamA || !teamB) return;
 
     teamA.played += 1;
@@ -168,60 +176,31 @@ export function getStandings(sport: string): Record<string, Standing[]> {
       teamA.goalsAgainst = (teamA.goalsAgainst || 0) + m.scoreB;
       teamB.goalsFor = (teamB.goalsFor || 0) + m.scoreB;
       teamB.goalsAgainst = (teamB.goalsAgainst || 0) + m.scoreA;
-
-      if (m.scoreA > m.scoreB) {
-        teamA.won += 1;
-        teamA.points += 3;
-        teamB.lost += 1;
-      } else if (m.scoreB > m.scoreA) {
-        teamB.won += 1;
-        teamB.points += 3;
-        teamA.lost += 1;
-      } else {
-        teamA.draw = (teamA.draw || 0) + 1;
-        teamB.draw = (teamB.draw || 0) + 1;
-        teamA.points += 1;
-        teamB.points += 1;
-      }
+      if (m.scoreA > m.scoreB) { teamA.won += 1; teamA.points += 3; teamB.lost += 1; }
+      else if (m.scoreB > m.scoreA) { teamB.won += 1; teamB.points += 3; teamA.lost += 1; }
+      else { teamA.draw = (teamA.draw || 0) + 1; teamB.draw = (teamB.draw || 0) + 1; teamA.points += 1; teamB.points += 1; }
     } else {
-      // Volleyball (sets - Best of 3)
       teamA.setsFor = (teamA.setsFor || 0) + m.scoreA;
       teamA.setsAgainst = (teamA.setsAgainst || 0) + m.scoreB;
       teamB.setsFor = (teamB.setsFor || 0) + m.scoreB;
       teamB.setsAgainst = (teamB.setsAgainst || 0) + m.scoreA;
-
       if (m.scoreA > m.scoreB) {
-        teamA.won += 1;
-        teamB.lost += 1;
-        if (m.scoreB === 0) {
-          teamA.points += 3;
-        } else {
-          teamA.points += 2;
-        }
+        teamA.won += 1; teamB.lost += 1;
+        teamA.points += m.scoreB === 0 ? 3 : 2;
       } else if (m.scoreB > m.scoreA) {
-        teamB.won += 1;
-        teamA.lost += 1;
-        if (m.scoreA === 0) {
-          teamB.points += 3;
-        } else {
-          teamB.points += 2;
-        }
+        teamB.won += 1; teamA.lost += 1;
+        teamB.points += m.scoreA === 0 ? 3 : 2;
       }
     }
   });
 
   const result: Record<string, Standing[]> = {};
-
   Object.keys(standingsMap).sort().forEach((groupName) => {
     const list = Object.values(standingsMap[groupName]);
     list.sort((a, b) => {
       if (b.points !== a.points) return b.points - a.points;
-      const diffA = isBallSport
-        ? (a.goalsFor || 0) - (a.goalsAgainst || 0)
-        : (a.setsFor || 0) - (a.setsAgainst || 0);
-      const diffB = isBallSport
-        ? (b.goalsFor || 0) - (b.goalsAgainst || 0)
-        : (b.setsFor || 0) - (b.setsAgainst || 0);
+      const diffA = isBallSport ? (a.goalsFor || 0) - (a.goalsAgainst || 0) : (a.setsFor || 0) - (a.setsAgainst || 0);
+      const diffB = isBallSport ? (b.goalsFor || 0) - (b.goalsAgainst || 0) : (b.setsFor || 0) - (b.setsAgainst || 0);
       if (diffB !== diffA) return diffB - diffA;
       return b.won - a.won;
     });
