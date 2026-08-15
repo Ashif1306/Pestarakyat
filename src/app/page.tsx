@@ -5,6 +5,9 @@ import MatchCard from '@/components/MatchCard';
 import KlasemenModalButton from '@/components/KlasemenModalButton';
 import { getEvent, getTodayMatches, getMatches } from '@/lib/data';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function HomePage() {
   const event = getEvent();
   const allMatches = getMatches();

@@ -20,6 +20,26 @@ if (typeof window !== 'undefined') {
 }
 
 export function getMatches(): Match[] {
+  // On Node.js Server side: ALWAYS read live from disk (data/matches.json)
+  if (typeof window === 'undefined') {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const filePath = path.join(process.cwd(), 'data', 'matches.json');
+      if (fs.existsSync(filePath)) {
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        const parsed = JSON.parse(fileContent);
+        if (parsed && Array.isArray(parsed.matches)) {
+          return parsed.matches;
+        }
+      }
+    } catch (e) {
+      console.warn('Server read error for matches.json:', e);
+    }
+    return (matchesData as { matches: Match[] }).matches;
+  }
+
+  // On Client Browser side: return in-memory runtime cache if fetched, else fallback
   if (runtimeMatchesCache && runtimeMatchesCache.length > 0) {
     return runtimeMatchesCache;
   }
