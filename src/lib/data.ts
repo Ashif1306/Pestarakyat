@@ -1,9 +1,22 @@
 import type { EventData, Match, Team, Standing } from '@/types';
 
-// ─── Static fallback data (used only if DB unreachable) ────────────────────
-import staticEventData from '../../data/event.json';
-import staticTeamsData from '../../data/teams.json';
-import staticMatchesData from '../../data/matches.json';
+// ─── Hardcoded minimal fallback (used only if DB unreachable) ───────────────
+const staticEventData: EventData = {
+  name: 'Pesta Rakyat X KKN IAIN',
+  tagline: 'Berkarya, Berbagi, Menginspirasi',
+  description: 'Turnamen olahraga antar dusun & pemuda dalam rangka Pesta Rakyat yang diselenggarakan oleh mahasiswa KKN IAIN Parepare Posko 03 Angkatan 37 berkolaborasi dengan Pemuda Balabatu.',
+  startDate: '2026-08-10',
+  endDate: '2026-08-25',
+  location: 'Dusun Bala Batu, Desa Buntu Barana, Kec. Curio, Kab. Enrekang',
+  organizer: 'KKN IAIN Parepare Posko 03 Angkatan 37 × Pemuda Balabatu',
+  sports: [
+    { id: 'volly-putra', name: 'Volly Putra', icon: '🏐', color: '#0ea5e9', totalTeams: 12, totalGroups: 4 },
+    { id: 'volly-putri', name: 'Volly Putri', icon: '🏐', color: '#e11d48', totalTeams: 12, totalGroups: 4 },
+    { id: 'sepak-bola-mini', name: 'Sepak Bola Mini', icon: '⚽', color: '#16a34a', totalTeams: 12, totalGroups: 2 },
+  ],
+};
+const staticTeamsData: Record<string, Team[]> = {};
+const staticMatchesData: { matches: Match[] } = { matches: [] };
 
 // ─── In-memory runtime cache (client-side) ──────────────────────────────────
 let runtimeMatchesCache: Match[] | null = null;
