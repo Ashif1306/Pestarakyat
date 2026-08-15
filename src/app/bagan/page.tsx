@@ -24,7 +24,7 @@ function BaganContent() {
         </div>
         <h1 className="text-3xl sm:text-5xl font-extrabold text-white">Bagan Turnamen</h1>
         <p className="text-slate-400 text-sm sm:text-base">
-          Bagan sistem gugur interaktif per cabang pertandingan. Klik ▶ untuk meloloskan tim.
+          Bagan sistem gugur otomatis per cabang pertandingan. Ter-update secara real-time dari hasil pertandingan.
         </p>
       </div>
 
@@ -46,9 +46,10 @@ function BaganContent() {
         ))}
       </div>
 
-      {/* Interactive Bracket */}
+      {/* Automatic Bracket */}
       <BracketViewer
         key={selectedSport}
+        sportId={selectedSport}
         sportName={activeSportObj.name}
         teams={teams}
       />

@@ -260,6 +260,7 @@ function SportDetailTabsContent({
         {/* Bagan Tab */}
         {activeTab === 'bagan' && (
           <BracketViewer
+            sportId={sportId}
             sportName={sportName}
             teams={teams}
           />
