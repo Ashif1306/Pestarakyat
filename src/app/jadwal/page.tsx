@@ -33,6 +33,12 @@ export default function JadwalPage() {
     fetchServerMatches().then((list) => {
       setAllMatches(list);
     });
+    const interval = setInterval(() => {
+      fetchServerMatches().then((list) => {
+        setAllMatches(list);
+      });
+    }, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   const todayStr = '2026-08-15';

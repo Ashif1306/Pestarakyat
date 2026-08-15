@@ -10,32 +10,24 @@ export function getEvent(): EventData {
 // In-memory runtime cache for client-side fetched matches
 let runtimeMatchesCache: Match[] | null = null;
 
+// Clear stale localStorage on client init
+if (typeof window !== 'undefined') {
+  try {
+    localStorage.removeItem('pr_matches');
+  } catch {
+    // ignore
+  }
+}
+
 export function getMatches(): Match[] {
   if (runtimeMatchesCache && runtimeMatchesCache.length > 0) {
     return runtimeMatchesCache;
-  }
-  if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('pr_matches');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as Match[];
-        if (parsed && parsed.length > 0) {
-          runtimeMatchesCache = parsed;
-          return parsed;
-        }
-      } catch {
-        // Fall back to static JSON
-      }
-    }
   }
   return (matchesData as { matches: Match[] }).matches;
 }
 
 export function setRuntimeMatches(matches: Match[]) {
   runtimeMatchesCache = matches;
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('pr_matches', JSON.stringify(matches));
-  }
 }
 
 export async function fetchServerMatches(): Promise<Match[]> {

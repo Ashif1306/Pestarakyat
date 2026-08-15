@@ -74,6 +74,10 @@ function SportDetailTabsContent({
 
   useEffect(() => {
     fetchServerMatches().then(() => reloadData());
+    const interval = setInterval(() => {
+      fetchServerMatches().then(() => reloadData());
+    }, 3000);
+    return () => clearInterval(interval);
   }, [sportId]);
 
   const isBallSport = sportId === 'sepak-bola-mini';
