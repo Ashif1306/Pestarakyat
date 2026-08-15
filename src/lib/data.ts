@@ -133,7 +133,7 @@ export function getStandings(sport: string): Record<string, Standing[]> {
         teamB.points += 1;
       }
     } else {
-      // Volleyball (sets)
+      // Volleyball (sets - Best of 3)
       teamA.setsFor = (teamA.setsFor || 0) + m.scoreA;
       teamA.setsAgainst = (teamA.setsAgainst || 0) + m.scoreB;
       teamB.setsFor = (teamB.setsFor || 0) + m.scoreB;
@@ -141,12 +141,22 @@ export function getStandings(sport: string): Record<string, Standing[]> {
 
       if (m.scoreA > m.scoreB) {
         teamA.won += 1;
-        teamA.points += 3; // 3 points per win
         teamB.lost += 1;
+        // Menang 2 - 0 -> 3 poin; Menang 2 - 1 -> 2 poin; Kalah -> 0 poin
+        if (m.scoreB === 0) {
+          teamA.points += 3;
+        } else {
+          teamA.points += 2;
+        }
       } else if (m.scoreB > m.scoreA) {
         teamB.won += 1;
-        teamB.points += 3;
         teamA.lost += 1;
+        // Menang 2 - 0 -> 3 poin; Menang 2 - 1 -> 2 poin; Kalah -> 0 poin
+        if (m.scoreA === 0) {
+          teamB.points += 3;
+        } else {
+          teamB.points += 2;
+        }
       }
     }
   });

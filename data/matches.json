@@ -203,61 +203,61 @@
       "id": "vp-1", "sport": "volly-putra", "phase": "group", "group": "A", "round": "Fase Grup A",
       "teamA": "Pemula Squad", "teamB": "PBV Uluway",
       "date": "2026-08-10", "time": "16:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 1, "winner": "Pemula Squad"
+      "status": "finished", "scoreA": 2, "scoreB": 0, "winner": "Pemula Squad"
     },
     {
       "id": "vp-2", "sport": "volly-putra", "phase": "group", "group": "B", "round": "Fase Grup B",
       "teamA": "PBV Siduruk", "teamB": "Le'To Bara",
       "date": "2026-08-10", "time": "17:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 2, "scoreB": 3, "winner": "Le'To Bara"
+      "status": "finished", "scoreA": 1, "scoreB": 2, "winner": "Le'To Bara"
     },
     {
       "id": "vp-3", "sport": "volly-putra", "phase": "group", "group": "C", "round": "Fase Grup C",
       "teamA": "PBV Bunga Duri", "teamB": "PBV Lamba",
       "date": "2026-08-11", "time": "16:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 0, "winner": "PBV Bunga Duri"
+      "status": "finished", "scoreA": 2, "scoreB": 0, "winner": "PBV Bunga Duri"
     },
     {
       "id": "vp-4", "sport": "volly-putra", "phase": "group", "group": "D", "round": "Fase Grup D",
       "teamA": "MVC Malannying", "teamB": "Solleakka Group",
       "date": "2026-08-11", "time": "17:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 2, "winner": "MVC Malannying"
+      "status": "finished", "scoreA": 2, "scoreB": 1, "winner": "MVC Malannying"
     },
     {
       "id": "vp-5", "sport": "volly-putra", "phase": "group", "group": "B", "round": "Fase Grup B",
       "teamA": "Le'To Bara", "teamB": "PBV Masbro",
       "date": "2026-08-12", "time": "16:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 1, "winner": "Le'To Bara"
+      "status": "finished", "scoreA": 2, "scoreB": 1, "winner": "Le'To Bara"
     },
     {
       "id": "vp-6", "sport": "volly-putra", "phase": "group", "group": "D", "round": "Fase Grup D",
       "teamA": "Solleakka Group", "teamB": "PBV Bala Batu A",
       "date": "2026-08-12", "time": "17:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 1, "scoreB": 3, "winner": "PBV Bala Batu A"
+      "status": "finished", "scoreA": 1, "scoreB": 2, "winner": "PBV Bala Batu A"
     },
     {
       "id": "vp-7", "sport": "volly-putra", "phase": "group", "group": "C", "round": "Fase Grup C",
       "teamA": "PBV Lamba", "teamB": "PBV Bala Batu B",
       "date": "2026-08-13", "time": "16:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 0, "scoreB": 3, "winner": "PBV Bala Batu B"
+      "status": "finished", "scoreA": 0, "scoreB": 2, "winner": "PBV Bala Batu B"
     },
     {
       "id": "vp-8", "sport": "volly-putra", "phase": "group", "group": "A", "round": "Fase Grup A",
       "teamA": "PBV Liba", "teamB": "PBV Uluway",
       "date": "2026-08-13", "time": "17:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 0, "winner": "PBV Liba"
+      "status": "finished", "scoreA": 2, "scoreB": 0, "winner": "PBV Liba"
     },
     {
       "id": "vp-9", "sport": "volly-putra", "phase": "group", "group": "A", "round": "Fase Grup A",
       "teamA": "Pemula Squad", "teamB": "PBV Liba",
       "date": "2026-08-14", "time": "16:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 2, "winner": "Pemula Squad"
+      "status": "finished", "scoreA": 2, "scoreB": 1, "winner": "Pemula Squad"
     },
     {
       "id": "vp-10", "sport": "volly-putra", "phase": "group", "group": "B", "round": "Fase Grup B",
       "teamA": "PBV Siduruk", "teamB": "PBV Masbro",
       "date": "2026-08-14", "time": "17:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 0, "winner": "PBV Siduruk"
+      "status": "finished", "scoreA": 2, "scoreB": 0, "winner": "PBV Siduruk"
     },
     {
       "id": "vp-11", "sport": "volly-putra", "phase": "group", "group": "C", "round": "Fase Grup C",
@@ -318,61 +318,61 @@
       "id": "vpi-1", "sport": "volly-putri", "phase": "group", "group": "A", "round": "Fase Grup A",
       "teamA": "Alloan Squad", "teamB": "PBV Bala Batu A",
       "date": "2026-08-10", "time": "16:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 1, "scoreB": 3, "winner": "PBV Bala Batu A"
+      "status": "finished", "scoreA": 1, "scoreB": 2, "winner": "PBV Bala Batu A"
     },
     {
       "id": "vpi-2", "sport": "volly-putri", "phase": "group", "group": "B", "round": "Fase Grup B",
       "teamA": "MTs", "teamB": "Rante Limbong",
       "date": "2026-08-10", "time": "17:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 0, "winner": "MTs"
+      "status": "finished", "scoreA": 2, "scoreB": 0, "winner": "MTs"
     },
     {
       "id": "vpi-3", "sport": "volly-putri", "phase": "group", "group": "B", "round": "Fase Grup B",
       "teamA": "Rante Limbong", "teamB": "Siduruk Tim",
       "date": "2026-08-11", "time": "16:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 1, "scoreB": 3, "winner": "Siduruk Tim"
+      "status": "finished", "scoreA": 1, "scoreB": 2, "winner": "Siduruk Tim"
     },
     {
       "id": "vpi-4", "sport": "volly-putri", "phase": "group", "group": "A", "round": "Fase Grup A",
       "teamA": "Buntu Kalosi", "teamB": "PBV Bala Batu A",
       "date": "2026-08-11", "time": "17:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 0, "scoreB": 3, "winner": "PBV Bala Batu A"
+      "status": "finished", "scoreA": 0, "scoreB": 2, "winner": "PBV Bala Batu A"
     },
     {
       "id": "vpi-5", "sport": "volly-putri", "phase": "group", "group": "A", "round": "Fase Grup A",
       "teamA": "Alloan Squad", "teamB": "Buntu Kalosi",
       "date": "2026-08-12", "time": "16:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 1, "winner": "Alloan Squad"
+      "status": "finished", "scoreA": 2, "scoreB": 1, "winner": "Alloan Squad"
     },
     {
       "id": "vpi-6", "sport": "volly-putri", "phase": "group", "group": "B", "round": "Fase Grup B",
       "teamA": "MTs", "teamB": "Siduruk Tim",
       "date": "2026-08-12", "time": "17:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 1, "winner": "MTs"
+      "status": "finished", "scoreA": 2, "scoreB": 1, "winner": "MTs"
     },
     {
       "id": "vpi-7", "sport": "volly-putri", "phase": "group", "group": "C", "round": "Fase Grup C",
       "teamA": "Buntu Ampalla", "teamB": "PBV Maliba",
       "date": "2026-08-13", "time": "16:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 0, "scoreB": 3, "winner": "PBV Maliba"
+      "status": "finished", "scoreA": 0, "scoreB": 2, "winner": "PBV Maliba"
     },
     {
       "id": "vpi-8", "sport": "volly-putri", "phase": "group", "group": "D", "round": "Fase Grup D",
       "teamA": "Maliba Simpang", "teamB": "SMPN 6 Alla",
       "date": "2026-08-13", "time": "17:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 2, "scoreB": 3, "winner": "SMPN 6 Alla"
+      "status": "finished", "scoreA": 1, "scoreB": 2, "winner": "SMPN 6 Alla"
     },
     {
       "id": "vpi-9", "sport": "volly-putri", "phase": "group", "group": "D", "round": "Fase Grup D",
       "teamA": "SMPN 6 Alla", "teamB": "PBV Bala Batu B",
       "date": "2026-08-14", "time": "16:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 1, "winner": "SMPN 6 Alla"
+      "status": "finished", "scoreA": 2, "scoreB": 1, "winner": "SMPN 6 Alla"
     },
     {
       "id": "vpi-10", "sport": "volly-putri", "phase": "group", "group": "C", "round": "Fase Grup C",
       "teamA": "Buntu Ampalla", "teamB": "Garuda Muda",
       "date": "2026-08-14", "time": "17:00", "venue": "Lapangan Utama Bala Batu",
-      "status": "finished", "scoreA": 3, "scoreB": 2, "winner": "Buntu Ampalla"
+      "status": "finished", "scoreA": 2, "scoreB": 1, "winner": "Buntu Ampalla"
     },
     {
       "id": "vpi-11", "sport": "volly-putri", "phase": "group", "group": "C", "round": "Fase Grup C",
