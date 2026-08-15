@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MatchCard from '@/components/MatchCard';
-import { getEvent, getMatches } from '@/lib/data';
+import { getEvent, getMatches, fetchServerMatches } from '@/lib/data';
 import { Sparkles, CheckCircle2, Radio } from 'lucide-react';
+import type { Match } from '@/types';
 
 function formatIndonesianDate(dateStr: string): string {
   const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'];
@@ -24,9 +25,15 @@ function formatIndonesianDate(dateStr: string): string {
 
 export default function JadwalPage() {
   const event = getEvent();
-  const allMatches = getMatches();
+  const [allMatches, setAllMatches] = useState<Match[]>([]);
   const [selectedSport, setSelectedSport] = useState<string>('all');
   const [selectedPhase, setSelectedPhase] = useState<string>('all');
+
+  useEffect(() => {
+    fetchServerMatches().then((list) => {
+      setAllMatches(list);
+    });
+  }, []);
 
   const todayStr = '2026-08-15';
 

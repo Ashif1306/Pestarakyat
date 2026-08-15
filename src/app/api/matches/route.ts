@@ -7,7 +7,13 @@ export async function GET() {
   try {
     const filePath = path.join(process.cwd(), 'data', 'matches.json');
     const data = fs.readFileSync(filePath, 'utf8');
-    return NextResponse.json(JSON.parse(data));
+    return NextResponse.json(JSON.parse(data), {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to read matches data' }, { status: 500 });
   }
@@ -25,7 +31,11 @@ export async function POST(request: Request) {
     const filePath = path.join(process.cwd(), 'data', 'matches.json');
     fs.writeFileSync(filePath, JSON.stringify({ matches }, null, 2), 'utf8');
 
-    return NextResponse.json({ success: true, message: 'Data matches berhasil disimpan ke database JSON!' });
+    return NextResponse.json({ success: true, message: 'Data matches berhasil disimpan ke database JSON!' }, {
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to write matches data' }, { status: 500 });
   }

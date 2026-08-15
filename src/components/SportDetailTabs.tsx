@@ -6,7 +6,7 @@ import { Calendar, BarChart3, Trophy, ClipboardList, Sparkles, CheckCircle2, Rad
 import MatchCard from '@/components/MatchCard';
 import StandingsTable from '@/components/StandingsTable';
 import BracketViewer from '@/components/BracketViewer';
-import { getStandings, getMatchesBySport } from '@/lib/data';
+import { getStandings, getMatchesBySport, fetchServerMatches } from '@/lib/data';
 import type { Match, Standing, Team } from '@/types';
 
 interface SportDetailTabsProps {
@@ -73,7 +73,7 @@ function SportDetailTabsContent({
   };
 
   useEffect(() => {
-    reloadData();
+    fetchServerMatches().then(() => reloadData());
   }, [sportId]);
 
   const isBallSport = sportId === 'sepak-bola-mini';

@@ -7,23 +7,67 @@ export function getEvent(): EventData {
   return eventData as EventData;
 }
 
+// In-memory runtime cache for client-side fetched matches
+let runtimeMatchesCache: Match[] | null = null;
+
 export function getMatches(): Match[] {
+  if (runtimeMatchesCache && runtimeMatchesCache.length > 0) {
+    return runtimeMatchesCache;
+  }
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('pr_matches');
     if (saved) {
       try {
-        return JSON.parse(saved) as Match[];
+        const parsed = JSON.parse(saved) as Match[];
+        if (parsed && parsed.length > 0) {
+          runtimeMatchesCache = parsed;
+          return parsed;
+        }
       } catch {
-        // Fall back to static JSON if parse fails
+        // Fall back to static JSON
       }
     }
   }
   return (matchesData as { matches: Match[] }).matches;
 }
 
-export function saveMatches(matches: Match[]) {
+export function setRuntimeMatches(matches: Match[]) {
+  runtimeMatchesCache = matches;
   if (typeof window !== 'undefined') {
     localStorage.setItem('pr_matches', JSON.stringify(matches));
+  }
+}
+
+export async function fetchServerMatches(): Promise<Match[]> {
+  if (typeof window === 'undefined') {
+    return getMatches();
+  }
+  try {
+    const res = await fetch('/api/matches?t=' + Date.now(), {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache' },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.matches && Array.isArray(data.matches)) {
+        setRuntimeMatches(data.matches);
+        return data.matches;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch matches from server API, using local fallback:', err);
+  }
+  return getMatches();
+}
+
+export function saveMatches(matches: Match[]) {
+  setRuntimeMatches(matches);
+  if (typeof window !== 'undefined') {
+    fetch('/api/matches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ matches }),
+    }).catch((err) => console.error('Save to server failed:', err));
   }
 }
 
@@ -53,13 +97,11 @@ export function getFinishedMatchesBySport(sport: string): Match[] {
 }
 
 export function getTodayMatches(targetDate?: string): Match[] {
-  // Default to 2026-08-15 if current date is not in tournament range
   const dateStr = targetDate || '2026-08-15';
   const matches = getMatches();
   const todayList = matches.filter((m) => m.date === dateStr);
   
   if (todayList.length === 0) {
-    // Return live matches or next upcoming scheduled matches
     const live = matches.filter((m) => m.status === 'live');
     if (live.length > 0) return live;
     return matches.filter((m) => m.status === 'scheduled').slice(0, 4);
@@ -72,7 +114,6 @@ export function getStandings(sport: string): Record<string, Standing[]> {
   const matches = getMatchesBySport(sport);
   const isBallSport = sport === 'sepak-bola-mini';
 
-  // Group teams by their group
   const standingsMap: Record<string, Record<string, Standing>> = {};
 
   teams.forEach((t) => {
@@ -94,11 +135,9 @@ export function getStandings(sport: string): Record<string, Standing[]> {
     };
   });
 
-  // Calculate stats from finished matches (or matches with score)
   matches.forEach((m) => {
     if (m.phase !== 'group') return;
     if (m.scoreA === null || m.scoreB === null) return;
-    // Count matches that are finished or live with score
     if (m.status !== 'finished' && m.status !== 'live') return;
 
     const groupName = m.group || 'A';
@@ -142,7 +181,6 @@ export function getStandings(sport: string): Record<string, Standing[]> {
       if (m.scoreA > m.scoreB) {
         teamA.won += 1;
         teamB.lost += 1;
-        // Menang 2 - 0 -> 3 poin; Menang 2 - 1 -> 2 poin; Kalah -> 0 poin
         if (m.scoreB === 0) {
           teamA.points += 3;
         } else {
@@ -151,7 +189,6 @@ export function getStandings(sport: string): Record<string, Standing[]> {
       } else if (m.scoreB > m.scoreA) {
         teamB.won += 1;
         teamA.lost += 1;
-        // Menang 2 - 0 -> 3 poin; Menang 2 - 1 -> 2 poin; Kalah -> 0 poin
         if (m.scoreA === 0) {
           teamB.points += 3;
         } else {
@@ -161,7 +198,6 @@ export function getStandings(sport: string): Record<string, Standing[]> {
     }
   });
 
-  // Convert to sorted arrays per group
   const result: Record<string, Standing[]> = {};
 
   Object.keys(standingsMap).sort().forEach((groupName) => {
