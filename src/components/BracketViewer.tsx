@@ -21,11 +21,9 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   const [standings, setStandings] = useState<Record<string, Standing[]>>(getStandings(sportId));
 
   useEffect(() => {
-    // Synchronously set initial matches & standings
     setMatches(getMatchesBySport(sportId));
     setStandings(getStandings(sportId));
 
-    // Fetch fresh database matches from server API
     fetchServerMatches().then((fresh) => {
       if (fresh && Array.isArray(fresh) && fresh.length > 0) {
         const filtered = fresh.filter((m) => m.sport === sportId);
@@ -57,12 +55,28 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   const sfMatches = matches.filter((m) => m.phase === 'knockout' && m.round.toLowerCase().includes('semi'));
   const finalMatch = matches.find((m) => m.phase === 'knockout' && m.round.toLowerCase().includes('final'));
 
+  // Helper: Check if team name is a real team name or placeholder
+  const isRealTeam = (name?: string | null) => {
+    if (!name) return false;
+    const lower = name.toLowerCase();
+    if (
+      lower.includes('juara') ||
+      lower.includes('runner') ||
+      lower.includes('pemenang') ||
+      lower.includes('tim...') ||
+      lower === 'tbd'
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   // Helper: Get QF team (prioritize admin DB override, then standings position, then default placeholder)
   const getQFTeam = (qfIndex: number, isTeamA: boolean, defaultPlaceholder: string, standingsTeam?: string) => {
     const m = qfMatches[qfIndex];
     if (m) {
       const val = isTeamA ? m.teamA : m.teamB;
-      if (val && !val.toLowerCase().includes('juara') && !val.toLowerCase().includes('runner') && !val.toLowerCase().includes('pemenang')) {
+      if (isRealTeam(val)) {
         return val;
       }
     }
@@ -92,10 +106,10 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       [getQFTeam(1, true, 'Juara Full B', leaderB), getQFTeam(1, false, 'Runner Up A', runnerA)],
     ];
   } else {
-    const sf1A = sfMatches[0]?.teamA && !sfMatches[0].teamA.toLowerCase().includes('pemenang') ? sfMatches[0].teamA : (qfWinners[0] || 'Tim...');
-    const sf1B = sfMatches[0]?.teamB && !sfMatches[0].teamB.toLowerCase().includes('pemenang') ? sfMatches[0].teamB : (qfWinners[1] || 'Tim...');
-    const sf2A = sfMatches[1]?.teamA && !sfMatches[1].teamA.toLowerCase().includes('pemenang') ? sfMatches[1].teamA : (qfWinners[2] || 'Tim...');
-    const sf2B = sfMatches[1]?.teamB && !sfMatches[1].teamB.toLowerCase().includes('pemenang') ? sfMatches[1].teamB : (qfWinners[3] || 'Tim...');
+    const sf1A = isRealTeam(sfMatches[0]?.teamA) ? sfMatches[0].teamA : (qfWinners[0] || 'TBD');
+    const sf1B = isRealTeam(sfMatches[0]?.teamB) ? sfMatches[0].teamB : (qfWinners[1] || 'TBD');
+    const sf2A = isRealTeam(sfMatches[1]?.teamA) ? sfMatches[1].teamA : (qfWinners[2] || 'TBD');
+    const sf2B = isRealTeam(sfMatches[1]?.teamB) ? sfMatches[1].teamB : (qfWinners[3] || 'TBD');
 
     sfPairs = [
       [sf1A, sf1B],
@@ -111,8 +125,8 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   });
 
   // Final Pair
-  const finalA = finalMatch?.teamA && !finalMatch.teamA.toLowerCase().includes('pemenang') ? finalMatch.teamA : (sfWinners[0] || 'Tim...');
-  const finalB = finalMatch?.teamB && !finalMatch.teamB.toLowerCase().includes('pemenang') ? finalMatch.teamB : (sfWinners[1] || 'Tim...');
+  const finalA = finalMatch?.teamA && isRealTeam(finalMatch.teamA) ? finalMatch.teamA : (sfWinners[0] || 'TBD');
+  const finalB = finalMatch?.teamB && isRealTeam(finalMatch.teamB) ? finalMatch.teamB : (sfWinners[1] || 'TBD');
 
   const finalPair: [string, string] = [finalA, finalB];
 
@@ -301,6 +315,8 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
               const scoreAStr = m?.scoreA !== null && m?.scoreA !== undefined ? String(m.scoreA) : '-';
               const scoreBStr = m?.scoreB !== null && m?.scoreB !== undefined ? String(m.scoreB) : '-';
               const winner = m?.winner;
+              const isTbdA = pair[0] === 'TBD';
+              const isTbdB = pair[1] === 'TBD';
 
               return (
                 <div
@@ -314,7 +330,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                       winner === pair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
                     }`}
                   >
-                    <span className={`text-xs font-semibold truncate max-w-[130px] ${pair[0] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                    <span className={`text-xs font-semibold truncate max-w-[130px] ${isTbdA ? 'italic text-slate-400 font-bold' : ''}`}>
                       {pair[0]}
                     </span>
                     <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
@@ -328,7 +344,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                       winner === pair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
                     }`}
                   >
-                    <span className={`text-xs font-semibold truncate max-w-[130px] ${pair[1] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                    <span className={`text-xs font-semibold truncate max-w-[130px] ${isTbdB ? 'italic text-slate-400 font-bold' : ''}`}>
                       {pair[1]}
                     </span>
                     <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
@@ -356,7 +372,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                   tournamentWinner === finalPair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
                 }`}
               >
-                <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[0] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[0] === 'TBD' ? 'italic text-slate-400 font-bold' : ''}`}>
                   {finalPair[0]}
                 </span>
                 <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
@@ -370,7 +386,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                   tournamentWinner === finalPair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
                 }`}
               >
-                <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[1] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[1] === 'TBD' ? 'italic text-slate-400 font-bold' : ''}`}>
                   {finalPair[1]}
                 </span>
                 <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
