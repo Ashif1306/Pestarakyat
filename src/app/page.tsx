@@ -4,6 +4,7 @@ import SportCards from '@/components/SportCards';
 import MatchCard from '@/components/MatchCard';
 import KlasemenModalButton from '@/components/KlasemenModalButton';
 import WitaLiveClock from '@/components/WitaLiveClock';
+import WelcomeToast from '@/components/WelcomeToast';
 import { getEvent, getTodayMatches, getMatches } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
@@ -29,6 +30,8 @@ export default function HomePage() {
 
   return (
     <div className="space-y-20 pb-16">
+      {/* 3-Second Welcome Onboarding Toast */}
+      <WelcomeToast />
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-white/[0.06] bg-[#0a1628] px-4">
         {/* Background Effects */}
