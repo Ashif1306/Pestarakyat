@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Printer, Trophy, MoveHorizontal, Info, X } from 'lucide-react';
-import { getMatchesBySport, getStandings, fetchServerMatches } from '@/lib/data';
+import { Printer, Trophy, MoveHorizontal, Info, X, Calendar } from 'lucide-react';
+import { getMatchesBySport, getStandings, fetchServerMatches, getStandingsWithMatches } from '@/lib/data';
 import type { Match, Standing, Team } from '@/types';
 
 interface BracketViewerProps {
@@ -21,14 +21,11 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   const [standings, setStandings] = useState<Record<string, Standing[]>>(getStandings(sportId));
 
   useEffect(() => {
-    setMatches(getMatchesBySport(sportId));
-    setStandings(getStandings(sportId));
-
     fetchServerMatches().then((fresh) => {
       if (fresh && Array.isArray(fresh) && fresh.length > 0) {
         const filtered = fresh.filter((m) => m.sport === sportId);
         setMatches(filtered);
-        setStandings(getStandings(sportId));
+        setStandings(getStandingsWithMatches(fresh, sportId));
       }
     });
   }, [sportId]);
@@ -201,9 +198,16 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       {/* Title & Toolbar Header */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-4 border-b border-white/[0.06] no-print">
         <div className="text-center sm:text-left space-y-1">
-          <h2 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wider">
-            BAGAN SISTEM GUGUR
-          </h2>
+          <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
+            <h2 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wider">
+              BAGAN SISTEM GUGUR
+            </h2>
+            {!isMiniFootball && (
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase tracking-wide">
+                ⚡ Babak Knockout Best of 5 Sets (5 Set)
+              </span>
+            )}
+          </div>
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
             PERTANDINGAN {sportName.toUpperCase()}
           </p>
@@ -250,17 +254,17 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       <div className="overflow-x-auto custom-scrollbar pb-4 pt-1">
         <div
           ref={containerRef}
-          className={`relative min-h-[520px] flex items-center justify-between gap-8 sm:gap-12 px-4 py-4 ${
-            isMiniFootball ? 'min-w-[480px]' : 'min-w-[720px]'
+          className={`relative min-h-[560px] flex items-center justify-between gap-8 sm:gap-12 px-4 py-4 ${
+            isMiniFootball ? 'min-w-[500px]' : 'min-w-[760px]'
           }`}
         >
           <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
 
           {/* Round 1: PEREMPAT FINAL (Volly Putra & Putri) */}
           {!isMiniFootball && (
-            <div className="relative z-10 flex flex-col justify-around space-y-8 w-52 sm:w-60 flex-shrink-0">
+            <div className="relative z-10 flex flex-col justify-around space-y-8 w-56 sm:w-64 flex-shrink-0">
               <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
-                PEREMPAT FINAL
+                PEREMPAT FINAL (5 SET)
               </h3>
 
               {qfPairs.map((pair, idx) => {
@@ -273,8 +277,19 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                   <div
                     key={idx}
                     id={`qf-${idx}`}
-                    className="bg-[#1a2942] border border-slate-700/60 rounded-xl overflow-hidden shadow-md space-y-0.5 p-1"
+                    className="bg-[#1a2942] border border-slate-700/60 rounded-xl overflow-hidden shadow-md p-1.5 space-y-1"
                   >
+                    {/* Match Date & Time */}
+                    {m?.date && (
+                      <div className="flex items-center justify-between text-[10px] font-bold text-cyan-400 px-2.5 py-1 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-cyan-400" />
+                          {m.date}
+                        </span>
+                        {m.time && <span className="font-mono text-slate-300">{m.time} WITA</span>}
+                      </div>
+                    )}
+
                     {/* Team A */}
                     <div
                       className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
@@ -305,9 +320,9 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
           )}
 
           {/* Round 2: SEMI FINAL */}
-          <div className="relative z-10 flex flex-col justify-around space-y-24 w-52 sm:w-60 flex-shrink-0">
+          <div className="relative z-10 flex flex-col justify-around space-y-24 w-56 sm:w-64 flex-shrink-0">
             <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
-              SEMI FINAL
+              SEMI FINAL {!isMiniFootball ? '(5 SET)' : ''}
             </h3>
 
             {sfPairs.map((pair, idx) => {
@@ -322,8 +337,19 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                 <div
                   key={idx}
                   id={`sf-${idx}`}
-                  className="bg-[#1a2942] border border-slate-700/60 rounded-xl overflow-hidden shadow-md space-y-0.5 p-1"
+                  className="bg-[#1a2942] border border-slate-700/60 rounded-xl overflow-hidden shadow-md p-1.5 space-y-1"
                 >
+                  {/* Match Date & Time */}
+                  {m?.date && (
+                    <div className="flex items-center justify-between text-[10px] font-bold text-cyan-400 px-2.5 py-1 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-cyan-400" />
+                        {m.date}
+                      </span>
+                      {m.time && <span className="font-mono text-slate-300">{m.time} WITA</span>}
+                    </div>
+                  )}
+
                   {/* Team A */}
                   <div
                     className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
@@ -357,15 +383,26 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
           </div>
 
           {/* Round 3: FINAL */}
-          <div className="relative z-10 flex flex-col justify-center space-y-4 w-52 sm:w-60 flex-shrink-0">
+          <div className="relative z-10 flex flex-col justify-center space-y-4 w-56 sm:w-64 flex-shrink-0">
             <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
-              FINAL
+              FINAL {!isMiniFootball ? '(5 SET)' : ''}
             </h3>
 
             <div
               id="final-0"
-              className="bg-[#1a2942] border-2 border-red-500/40 rounded-xl overflow-hidden shadow-xl space-y-0.5 p-1"
+              className="bg-[#1a2942] border-2 border-red-500/40 rounded-xl overflow-hidden shadow-xl p-1.5 space-y-1"
             >
+              {/* Match Date & Time */}
+              {finalMatch?.date && (
+                <div className="flex items-center justify-between text-[10px] font-bold text-red-400 px-2.5 py-1 bg-red-500/10 rounded-lg border border-red-500/20">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-red-400" />
+                    {finalMatch.date}
+                  </span>
+                  {finalMatch.time && <span className="font-mono text-slate-300">{finalMatch.time} WITA</span>}
+                </div>
+              )}
+
               {/* Team A */}
               <div
                 className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
