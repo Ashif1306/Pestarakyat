@@ -30,9 +30,20 @@ html.light body {
 }
 
 html.light nav {
-  background-color: rgba(255, 255, 255, 0.96) !important;
+  background-color: rgba(255, 255, 255, 0.98) !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+html.light nav div.md\:hidden {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light .bg-red-600,
+html.light .bg-red-600 * {
+  color: #ffffff !important;
 }
 
 html.light footer {
@@ -89,7 +100,7 @@ html.light [id^="sf-"] .text-slate-200 {
   color: #0f172a !important;
 }
 
-html.light .text-white {
+html.light .text-white:not(.bg-red-600):not(.bg-red-700):not(.bg-emerald-600):not(.bg-blue-600) {
   color: #0f172a !important;
 }
 
