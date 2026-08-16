@@ -52,8 +52,8 @@ export default function StandingsTable({ groupName, standings, isBallSport = fal
           </thead>
           <tbody>
             {standings.map((team, idx) => {
-              const forVal = team.goalsFor ?? team.setsFor ?? 0;
-              const againstVal = team.goalsAgainst ?? team.setsAgainst ?? 0;
+              const forVal = isBallSport ? (team.goalsFor ?? 0) : (team.setsFor ?? 0);
+              const againstVal = isBallSport ? (team.goalsAgainst ?? 0) : (team.setsAgainst ?? 0);
               const diff = forVal - againstVal;
               const isQualified = idx < 2; // Top 2 teams qualify for knockout
 
