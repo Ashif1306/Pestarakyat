@@ -145,7 +145,7 @@ export default function HomePage() {
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1">
               <Sparkles className="w-4 h-4" />
-              WAKTU INDONESIA TENGAH (WITA)
+              WAKTU BALABATU (WITA)
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Pertandingan Hari Ini</h2>
           </div>
