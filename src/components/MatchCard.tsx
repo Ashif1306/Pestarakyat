@@ -5,6 +5,12 @@ export default function MatchCard({ match }: { match: Match }) {
   const isFinished = match.status === 'finished';
   const isLive = match.status === 'live';
 
+  const sportInfo = match.sport === 'sepak-bola-mini'
+    ? { name: 'Sepak Bola Mini', icon: '⚽', badgeClass: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' }
+    : match.sport === 'volly-putri'
+    ? { name: 'Volly Putri', icon: '🏐', badgeClass: 'bg-rose-500/15 text-rose-400 border-rose-500/30' }
+    : { name: 'Volly Putra', icon: '🏐', badgeClass: 'bg-sky-500/15 text-sky-400 border-sky-500/30' };
+
   return (
     <div className={`relative bg-[#0f1d32] border rounded-xl p-5 transition-all shadow-lg overflow-hidden ${
       isLive ? 'border-red-500/60 shadow-red-500/15' : 'border-white/[0.06] hover:border-cyan-500/30 hover:shadow-cyan-500/5'
@@ -17,11 +23,20 @@ export default function MatchCard({ match }: { match: Match }) {
       }`} />
 
       {/* Header Info */}
-      <div className="flex items-center justify-between text-xs text-slate-400 mb-4 pb-3 border-b border-white/[0.06]">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 mb-4 pb-3 border-b border-white/[0.06]">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Sport Tag Badge */}
+          <span className={`font-bold text-[11px] px-2.5 py-1 rounded-md border flex items-center gap-1.5 shadow-sm ${sportInfo.badgeClass}`}>
+            <span>{sportInfo.icon}</span>
+            <span>{sportInfo.name}</span>
+          </span>
+
+          {/* Phase/Round Badge */}
           <span className="font-semibold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-md border border-cyan-500/20">
             {match.round}
           </span>
+
+          {/* Group Badge */}
           {match.group && (
             <span className="flex items-center gap-1 text-amber-400 bg-amber-500/10 px-2 py-1 rounded-md border border-amber-500/20">
               <Layers className="w-3 h-3" />
