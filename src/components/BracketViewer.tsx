@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { Printer, Trophy, CheckCircle2 } from 'lucide-react';
+import { Printer, Trophy, MoveHorizontal } from 'lucide-react';
 import { getMatchesBySport, getStandings } from '@/lib/data';
 import type { Team } from '@/types';
 
@@ -42,10 +42,6 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   const finalMatch = matches.find((m) => m.phase === 'knockout' && m.round.toLowerCase().includes('final'));
 
   // QF Pairings (Exact diagram match for Volly)
-  // QF 1: Juara Full A vs Runner Up B
-  // QF 2: Juara Full C vs Runner Up D
-  // QF 3: Juara Full B vs Runner Up C
-  // QF 4: Juara Full D vs Runner Up A
   const qfPairs: [string, string][] = [
     [leaderA, runnerB],
     [leaderC, runnerD],
@@ -150,37 +146,98 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   }, [matches, standings, isMiniFootball]);
 
   return (
-    <div className="bg-[#0f1d32] rounded-2xl border border-white/[0.06] p-6 shadow-2xl space-y-6">
-      {/* Title & Toolbar */}
-      <div className="text-center space-y-1 pb-4 border-b border-white/[0.06] relative">
-        <h2 className="text-xl font-extrabold text-white uppercase tracking-wider">
-          BAGAN SISTEM GUGUR
-        </h2>
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
-          PERTANDINGAN {sportName.toUpperCase()}
-        </p>
+    <div className="bg-[#0f1d32] rounded-2xl border border-white/[0.06] p-4 sm:p-6 shadow-2xl space-y-4 sm:space-y-6">
+      {/* Title & Toolbar Header */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-4 border-b border-white/[0.06] no-print">
+        <div className="text-center sm:text-left space-y-1">
+          <h2 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wider">
+            BAGAN SISTEM GUGUR
+          </h2>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+            PERTANDINGAN {sportName.toUpperCase()}
+          </p>
+        </div>
 
         <button
           onClick={() => window.print()}
-          className="absolute right-0 top-0 px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-lg no-print"
+          className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-lg hover:scale-105"
         >
-          <Printer className="w-3.5 h-3.5" /> Cetak
+          <Printer className="w-3.5 h-3.5" /> Cetak Bagan
         </button>
       </div>
 
-      {/* Bracket Area */}
-      <div ref={containerRef} className="relative min-h-[500px] flex items-center justify-around px-2 sm:px-6 py-4">
-        <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
+      {/* Mobile Scroll Hint Badge */}
+      <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-cyan-400 bg-cyan-500/10 py-1.5 px-3.5 rounded-full border border-cyan-500/20 sm:hidden w-fit mx-auto">
+        <MoveHorizontal className="w-3.5 h-3.5 animate-pulse text-cyan-400" />
+        <span>Geser ke samping untuk melihat seluruh bagan</span>
+      </div>
 
-        {/* Round 1: PEREMPAT FINAL (Volly Putra & Putri) */}
-        {!isMiniFootball && (
-          <div className="relative z-10 flex flex-col justify-around space-y-8 w-52 sm:w-60">
+      {/* Scrollable Bracket Area */}
+      <div className="overflow-x-auto custom-scrollbar pb-4 pt-1">
+        <div
+          ref={containerRef}
+          className={`relative min-h-[520px] flex items-center justify-between gap-8 sm:gap-12 px-4 py-4 ${
+            isMiniFootball ? 'min-w-[480px]' : 'min-w-[720px]'
+          }`}
+        >
+          <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
+
+          {/* Round 1: PEREMPAT FINAL (Volly Putra & Putri) */}
+          {!isMiniFootball && (
+            <div className="relative z-10 flex flex-col justify-around space-y-8 w-52 sm:w-60 flex-shrink-0">
+              <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
+                PEREMPAT FINAL
+              </h3>
+
+              {qfPairs.map((pair, idx) => {
+                const m = qfMatches[idx];
+                const scoreAStr = m?.scoreA !== null && m?.scoreA !== undefined ? String(m.scoreA) : '-';
+                const scoreBStr = m?.scoreB !== null && m?.scoreB !== undefined ? String(m.scoreB) : '-';
+                const winner = m?.winner;
+
+                return (
+                  <div
+                    key={idx}
+                    id={`qf-${idx}`}
+                    className="bg-[#1a2942] border border-slate-700/60 rounded-xl overflow-hidden shadow-md space-y-0.5 p-1"
+                  >
+                    {/* Team A */}
+                    <div
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                        winner === pair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                      }`}
+                    >
+                      <span className="text-xs font-semibold truncate max-w-[130px]">{pair[0]}</span>
+                      <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                        {scoreAStr}
+                      </span>
+                    </div>
+
+                    {/* Team B */}
+                    <div
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                        winner === pair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                      }`}
+                    >
+                      <span className="text-xs font-semibold truncate max-w-[130px]">{pair[1]}</span>
+                      <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                        {scoreBStr}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Round 2: SEMI FINAL */}
+          <div className="relative z-10 flex flex-col justify-around space-y-24 w-52 sm:w-60 flex-shrink-0">
             <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
-              PEREMPAT FINAL
+              SEMI FINAL
             </h3>
 
-            {qfPairs.map((pair, idx) => {
-              const m = qfMatches[idx];
+            {sfPairs.map((pair, idx) => {
+              const m = sfMatches[idx];
               const scoreAStr = m?.scoreA !== null && m?.scoreA !== undefined ? String(m.scoreA) : '-';
               const scoreBStr = m?.scoreB !== null && m?.scoreB !== undefined ? String(m.scoreB) : '-';
               const winner = m?.winner;
@@ -188,7 +245,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
               return (
                 <div
                   key={idx}
-                  id={`qf-${idx}`}
+                  id={`sf-${idx}`}
                   className="bg-[#1a2942] border border-slate-700/60 rounded-xl overflow-hidden shadow-md space-y-0.5 p-1"
                 >
                   {/* Team A */}
@@ -197,7 +254,9 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                       winner === pair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
                     }`}
                   >
-                    <span className="text-xs font-semibold truncate max-w-[140px]">{pair[0]}</span>
+                    <span className={`text-xs font-semibold truncate max-w-[130px] ${pair[0] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                      {pair[0]}
+                    </span>
                     <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
                       {scoreAStr}
                     </span>
@@ -209,7 +268,9 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                       winner === pair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
                     }`}
                   >
-                    <span className="text-xs font-semibold truncate max-w-[140px]">{pair[1]}</span>
+                    <span className={`text-xs font-semibold truncate max-w-[130px] ${pair[1] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                      {pair[1]}
+                    </span>
                     <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
                       {scoreBStr}
                     </span>
@@ -218,106 +279,56 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
               );
             })}
           </div>
-        )}
 
-        {/* Round 2: SEMI FINAL */}
-        <div className="relative z-10 flex flex-col justify-around space-y-24 w-52 sm:w-60">
-          <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
-            SEMI FINAL
-          </h3>
+          {/* Round 3: FINAL */}
+          <div className="relative z-10 flex flex-col justify-center space-y-4 w-52 sm:w-60 flex-shrink-0">
+            <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
+              FINAL
+            </h3>
 
-          {sfPairs.map((pair, idx) => {
-            const m = sfMatches[idx];
-            const scoreAStr = m?.scoreA !== null && m?.scoreA !== undefined ? String(m.scoreA) : '-';
-            const scoreBStr = m?.scoreB !== null && m?.scoreB !== undefined ? String(m.scoreB) : '-';
-            const winner = m?.winner;
-
-            return (
+            <div
+              id="final-0"
+              className="bg-[#1a2942] border-2 border-red-500/40 rounded-xl overflow-hidden shadow-xl space-y-0.5 p-1"
+            >
+              {/* Team A */}
               <div
-                key={idx}
-                id={`sf-${idx}`}
-                className="bg-[#1a2942] border border-slate-700/60 rounded-xl overflow-hidden shadow-md space-y-0.5 p-1"
+                className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                  tournamentWinner === finalPair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                }`}
               >
-                {/* Team A */}
-                <div
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                    winner === pair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
-                  }`}
-                >
-                  <span className={`text-xs font-semibold truncate max-w-[140px] ${pair[0] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
-                    {pair[0]}
-                  </span>
-                  <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
-                    {scoreAStr}
-                  </span>
-                </div>
-
-                {/* Team B */}
-                <div
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                    winner === pair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
-                  }`}
-                >
-                  <span className={`text-xs font-semibold truncate max-w-[140px] ${pair[1] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
-                    {pair[1]}
-                  </span>
-                  <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
-                    {scoreBStr}
-                  </span>
-                </div>
+                <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[0] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                  {finalPair[0]}
+                </span>
+                <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                  {finalMatch?.scoreA !== null && finalMatch?.scoreA !== undefined ? finalMatch.scoreA : '-'}
+                </span>
               </div>
-            );
-          })}
-        </div>
 
-        {/* Round 3: FINAL */}
-        <div className="relative z-10 flex flex-col justify-center space-y-4 w-52 sm:w-60">
-          <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
-            FINAL
-          </h3>
-
-          <div
-            id="final-0"
-            className="bg-[#1a2942] border-2 border-red-500/40 rounded-xl overflow-hidden shadow-xl space-y-0.5 p-1"
-          >
-            {/* Team A */}
-            <div
-              className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                tournamentWinner === finalPair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
-              }`}
-            >
-              <span className={`text-xs font-semibold truncate max-w-[140px] ${finalPair[0] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
-                {finalPair[0]}
-              </span>
-              <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
-                {finalMatch?.scoreA !== null && finalMatch?.scoreA !== undefined ? finalMatch.scoreA : '-'}
-              </span>
+              {/* Team B */}
+              <div
+                className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                  tournamentWinner === finalPair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                }`}
+              >
+                <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[1] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                  {finalPair[1]}
+                </span>
+                <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                  {finalMatch?.scoreB !== null && finalMatch?.scoreB !== undefined ? finalMatch.scoreB : '-'}
+                </span>
+              </div>
             </div>
 
-            {/* Team B */}
-            <div
-              className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                tournamentWinner === finalPair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
-              }`}
-            >
-              <span className={`text-xs font-semibold truncate max-w-[140px] ${finalPair[1] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
-                {finalPair[1]}
-              </span>
-              <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
-                {finalMatch?.scoreB !== null && finalMatch?.scoreB !== undefined ? finalMatch.scoreB : '-'}
-              </span>
-            </div>
+            {/* Winner Banner */}
+            {tournamentWinner && (
+              <div className="mt-4 text-center p-3 bg-gradient-to-r from-red-600/20 via-amber-500/20 to-red-600/20 border border-amber-500/40 rounded-xl shadow-lg animate-bounce">
+                <div className="text-[10px] uppercase font-extrabold text-amber-400 flex items-center justify-center gap-1">
+                  <Trophy className="w-3.5 h-3.5" /> JUARA 1
+                </div>
+                <div className="text-sm font-extrabold text-white mt-0.5">{tournamentWinner}</div>
+              </div>
+            )}
           </div>
-
-          {/* Winner Banner */}
-          {tournamentWinner && (
-            <div className="mt-4 text-center p-3 bg-gradient-to-r from-red-600/20 via-amber-500/20 to-red-600/20 border border-amber-500/40 rounded-xl shadow-lg animate-bounce">
-              <div className="text-[10px] uppercase font-extrabold text-amber-400 flex items-center justify-center gap-1">
-                <Trophy className="w-3.5 h-3.5" /> JUARA 1
-              </div>
-              <div className="text-sm font-extrabold text-white mt-0.5">{tournamentWinner}</div>
-            </div>
-          )}
         </div>
       </div>
     </div>
