@@ -22,22 +22,22 @@ body {
 }
 
 /* ==========================================================================
-   LIGHT MODE OVERRIDES
+   LIGHT MODE OVERRIDES - ULTRA HIGH CONTRAST & ACCESSIBILITY
    ========================================================================== */
 html.light body {
-  background-color: #f1f5f9 !important;
+  background-color: #f8fafc !important;
   color: #0f172a !important;
 }
 
 html.light nav {
   background-color: rgba(255, 255, 255, 0.98) !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  border-color: #cbd5e1 !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 html.light nav div.md\:hidden {
   background-color: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  border-color: #cbd5e1 !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
 }
 
@@ -48,33 +48,45 @@ html.light .bg-red-600 * {
 
 html.light footer {
   background-color: #e2e8f0 !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  border-color: #cbd5e1 !important;
 }
 
 html.light .bg-\[\#0a1628\],
 html.light section.bg-\[\#0a1628\] {
-  background-color: #f8fafc !important;
+  background-color: #f1f5f9 !important;
 }
 
 html.light .bg-\[\#0f1d32\] {
   background-color: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  border-color: #e2e8f0 !important;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
 }
 
 html.light .bg-\[\#081220\] {
-  background-color: #f1f5f9 !important;
+  background-color: #f8fafc !important;
 }
 
 html.light .bg-\[\#060e1c\] {
   background-color: #e2e8f0 !important;
 }
 
+/* Gradients in Light Mode */
+html.light .from-\[\#0f1d32\],
+html.light .via-\[\#0a1628\],
+html.light .to-\[\#0f1d32\],
+html.light .from-\[\#0a1628\],
+html.light .to-\[\#0a1628\] {
+  --tw-gradient-from: #ffffff !important;
+  --tw-gradient-to: #f8fafc !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #ffffff, var(--tw-gradient-to) !important;
+  background-color: #ffffff !important;
+}
+
 /* Grand Final Card in Light Mode */
 html.light #final-0 {
   background: #ffffff !important;
   background-image: none !important;
-  border-color: rgba(220, 38, 38, 0.4) !important;
+  border-color: rgba(220, 38, 38, 0.5) !important;
   box-shadow: 0 4px 20px rgba(220, 38, 38, 0.12) !important;
 }
 
@@ -91,7 +103,7 @@ html.light #final-0 .text-red-400 {
 html.light [id^="qf-"],
 html.light [id^="sf-"] {
   background-color: #ffffff !important;
-  border-color: rgba(14, 165, 233, 0.25) !important;
+  border-color: #cbd5e1 !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
 }
 
@@ -100,6 +112,7 @@ html.light [id^="sf-"] .text-slate-200 {
   color: #0f172a !important;
 }
 
+/* High Contrast Text & Accent Colors in Light Mode */
 html.light .text-white:not(.bg-red-600):not(.bg-red-700):not(.bg-emerald-600):not(.bg-blue-600) {
   color: #0f172a !important;
 }
@@ -120,12 +133,57 @@ html.light .text-slate-500 {
   color: #64748b !important;
 }
 
+html.light .text-cyan-400 {
+  color: #0284c7 !important;
+}
+
+html.light .text-amber-400 {
+  color: #d97706 !important;
+}
+
+html.light .text-emerald-400 {
+  color: #059669 !important;
+}
+
+html.light .text-red-400 {
+  color: #dc2626 !important;
+}
+
+html.light .bg-cyan-500\/10 {
+  background-color: rgba(14, 165, 233, 0.12) !important;
+  border-color: rgba(14, 165, 233, 0.3) !important;
+}
+
+html.light .bg-amber-500\/10 {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+html.light .bg-red-500\/10 {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+html.light .bg-slate-800 {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light .bg-slate-800 * {
+  color: #0f172a !important;
+}
+
+html.light .bg-slate-900 {
+  background-color: #f1f5f9 !important;
+}
+
 html.light .border-white\/\[0\.06\],
 html.light .border-white\/\[0\.04\],
 html.light .border-white\/\[0\.08\],
 html.light .border-white\/10,
 html.light .border-white\/5 {
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  border-color: #cbd5e1 !important;
 }
 
 html.light input,
@@ -152,59 +210,35 @@ html.light svg path {
   50% { opacity: 1; }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+.animate-glow {
+  animation: glow-pulse 3s infinite ease-in-out;
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
 }
 
-@keyframes live-dot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.5); opacity: 0.5; }
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 29, 50, 0.5);
+  border-radius: 4px;
 }
 
-.animate-glow-pulse {
-  animation: glow-pulse 2s ease-in-out infinite;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(14, 165, 233, 0.3);
+  border-radius: 4px;
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 0.6);
 }
 
-.animate-shimmer {
-  background-size: 200% 100%;
-  animation: shimmer 2s linear infinite;
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.animate-live-dot {
-  animation: live-dot 1.5s ease-in-out infinite;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.5);
-}
-
-@media print {
-  .no-print {
-    display: none !important;
-  }
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
 }

@@ -141,17 +141,17 @@ export default function HomePage() {
 
       {/* SECTION 2: JADWAL HARI INI / REST DAY (LIBUR) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/[0.06]">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1">
+            <div className="flex items-center gap-2 text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider mb-1">
               <Sparkles className="w-4 h-4" />
               WAKTU BALABATU (WITA)
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Pertandingan Hari Ini</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Pertandingan Hari Ini</h2>
           </div>
           <Link
             href="/jadwal"
-            className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 bg-cyan-500/10 px-3.5 py-2 rounded-lg border border-cyan-500/20 transition-all hover:scale-105"
+            className="text-xs font-bold text-cyan-700 dark:text-cyan-400 hover:text-cyan-600 flex items-center gap-1.5 bg-cyan-500/15 dark:bg-cyan-500/10 px-3.5 py-2 rounded-lg border border-cyan-500/30 transition-all hover:scale-105 shadow-sm"
           >
             Lihat Semua Jadwal
             <ArrowRight className="w-3.5 h-3.5" />
@@ -160,19 +160,19 @@ export default function HomePage() {
 
         {todayScheduled.length === 0 ? (
           /* REST DAY (HARI INI LIBUR) CARD */
-          <div className="bg-gradient-to-br from-[#0f1d32] via-[#0a1628] to-[#0f1d32] rounded-3xl border border-amber-500/30 p-8 sm:p-12 text-center space-y-6 shadow-2xl shadow-amber-500/5 relative overflow-hidden">
+          <div className="bg-white dark:bg-gradient-to-br dark:from-[#0f1d32] dark:via-[#0a1628] dark:to-[#0f1d32] rounded-3xl border border-amber-500/40 p-8 sm:p-12 text-center space-y-6 shadow-xl shadow-amber-500/10 relative overflow-hidden transition-colors">
             <div className="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-extrabold uppercase tracking-widest shadow-md">
-              <Coffee className="w-4 h-4" /> HARI INI LIBUR PERTANDINGAN
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 dark:bg-amber-500/10 border border-amber-500/40 text-amber-800 dark:text-amber-400 text-xs font-extrabold uppercase tracking-widest shadow-md">
+              <Coffee className="w-4 h-4 text-amber-600 dark:text-amber-400" /> HARI INI LIBUR PERTANDINGAN
             </div>
 
             <div className="space-y-2 max-w-xl mx-auto">
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
                 Selamat Beristirahat! 🌴
               </h3>
-              <p className="text-slate-300 text-sm leading-relaxed">
+              <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed font-medium">
                 Hari ini tidak ada jadwal pertandingan yang berlangsung. Seluruh atlet dan panitia sedang beristirahat untuk mempersiapkan babak seru berikutnya.
               </p>
             </div>
@@ -187,7 +187,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/hasil"
-                className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center gap-2 transition-all border border-white/10"
+                className="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs flex items-center gap-2 transition-all border border-slate-300 dark:border-white/10 hover:scale-105"
               >
                 Lihat Hasil Pertandingan Kemarin
               </Link>
