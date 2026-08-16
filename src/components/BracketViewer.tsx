@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { Printer, Trophy, MoveHorizontal } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Printer, Trophy, MoveHorizontal, Info, X } from 'lucide-react';
 import { getMatchesBySport, getStandings } from '@/lib/data';
 import type { Team } from '@/types';
 
@@ -14,6 +14,7 @@ interface BracketViewerProps {
 export default function BracketViewer({ sportId = 'volly-putra', sportName }: BracketViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const [showNotice, setShowNotice] = useState(false);
 
   // 1. Fetch current matches and standings real-time
   const matches = getMatchesBySport(sportId);
@@ -54,10 +55,6 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   };
 
   // QF Pairings (Exact diagram match for Volly)
-  // QF 1: Juara Full A vs Runner Up B
-  // QF 2: Juara Full C vs Runner Up D
-  // QF 3: Juara Full B vs Runner Up C
-  // QF 4: Juara Full D vs Runner Up A
   const qfPairs: [string, string][] = [
     [getQFTeam(0, true, 'Juara Full A', leaderA), getQFTeam(0, false, 'Runner Up B', runnerB)],
     [getQFTeam(1, true, 'Juara Full C', leaderC), getQFTeam(1, false, 'Runner Up D', runnerD)],
@@ -166,6 +163,10 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
     return () => window.removeEventListener('resize', drawLines);
   }, [matches, standings, isMiniFootball]);
 
+  const handlePrintClick = () => {
+    setShowNotice(true);
+  };
+
   return (
     <div className="bg-[#0f1d32] rounded-2xl border border-white/[0.06] p-4 sm:p-6 shadow-2xl space-y-4 sm:space-y-6">
       {/* Title & Toolbar Header */}
@@ -180,12 +181,35 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
         </div>
 
         <button
-          onClick={() => window.print()}
-          className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-lg hover:scale-105"
+          onClick={handlePrintClick}
+          className="px-4 py-2 rounded-xl bg-slate-700/80 hover:bg-slate-600 text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all shadow-md hover:scale-105 border border-white/10"
         >
-          <Printer className="w-3.5 h-3.5" /> Cetak Bagan
+          <Printer className="w-3.5 h-3.5 text-amber-400" /> Cetak Bagan
         </button>
       </div>
+
+      {/* Feature Disabled Notice Banner */}
+      {showNotice && (
+        <div className="bg-amber-500/15 border border-amber-500/40 rounded-xl p-4 flex items-start justify-between gap-3 text-amber-300 animate-fadeIn no-print">
+          <div className="flex items-start gap-2.5">
+            <Info className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <div className="text-xs font-extrabold uppercase tracking-wide text-amber-400">
+                Informasi Cetak Bagan
+              </div>
+              <p className="text-xs text-amber-200/90 leading-relaxed">
+                Fitur cetak bagan saat ini sedang dinonaktifkan sementara dan akan segera kembali. Terima kasih atas kesabarannya! 🙏
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowNotice(false)}
+            className="text-amber-400 hover:text-white p-1 rounded-lg hover:bg-amber-500/20 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Mobile Scroll Hint Badge */}
       <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-cyan-400 bg-cyan-500/10 py-1.5 px-3.5 rounded-full border border-cyan-500/20 sm:hidden w-fit mx-auto">
