@@ -31,18 +31,18 @@ export const DEFAULT_TEAMS: Record<string, Team[]> = {
     { id: "vp-t12", name: "PBV Lamba", group: "D" }
   ],
   "volly-putri": [
-    { id: "vpi-t1", name: "Alloan Squad", group: "A" },
-    { id: "vpi-t2", name: "PBV Bala Batu A", group: "A" },
-    { id: "vpi-t3", name: "Buntu Kalosi", group: "A" },
-    { id: "vpi-t4", name: "MTs", group: "B" },
-    { id: "vpi-t5", name: "Rante Limbong", group: "B" },
-    { id: "vpi-t6", name: "Siduruk Tim", group: "B" },
-    { id: "vpi-t7", name: "Buntu Ampalla", group: "C" },
-    { id: "vpi-t8", name: "PBV Maliba", group: "C" },
-    { id: "vpi-t9", name: "Garuda Muda", group: "C" },
-    { id: "vpi-t10", name: "Maliba Simpang", group: "D" },
-    { id: "vpi-t11", name: "SMPN 6 Alla", group: "D" },
-    { id: "vpi-t12", name: "PBV Bala Batu B", group: "D" }
+    { id: "vpi-t1", name: "MTs", group: "A" },
+    { id: "vpi-t2", name: "Rante Limbong", group: "A" },
+    { id: "vpi-t3", name: "Siduruk Tim", group: "A" },
+    { id: "vpi-t4", name: "SMPN 6 Alla", group: "B" },
+    { id: "vpi-t5", name: "Maliba Simpang", group: "B" },
+    { id: "vpi-t6", name: "PBV Bala Batu B", group: "B" },
+    { id: "vpi-t7", name: "Alloan Squad", group: "C" },
+    { id: "vpi-t8", name: "Buntu Kalosi", group: "C" },
+    { id: "vpi-t9", name: "PBV Bala Batu A", group: "C" },
+    { id: "vpi-t10", name: "Buntu Ampalla", group: "D" },
+    { id: "vpi-t11", name: "Garuda Muda", group: "D" },
+    { id: "vpi-t12", name: "PBV Maliba", group: "D" }
   ],
   "sepak-bola-mini": [
     { id: "sbm-1", name: "BUNTU BARANA A", group: "A" },
@@ -887,8 +887,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-1",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "A",
-    "round": "Fase Grup A",
+    "group": "C",
+    "round": "Fase Grup C",
     "teamA": "Alloan Squad",
     "teamB": "PBV Bala Batu A",
     "date": "2026-08-10",
@@ -903,8 +903,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-10",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "C",
-    "round": "Fase Grup C",
+    "group": "D",
+    "round": "Fase Grup D",
     "teamA": "Buntu Ampalla",
     "teamB": "Garuda Muda",
     "date": "2026-08-14",
@@ -919,8 +919,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-11",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "C",
-    "round": "Fase Grup C",
+    "group": "D",
+    "round": "Fase Grup D",
     "teamA": "Garuda Muda",
     "teamB": "PBV Maliba",
     "date": "2026-08-15",
@@ -935,8 +935,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-12",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "D",
-    "round": "Fase Grup D",
+    "group": "B",
+    "round": "Fase Grup B",
     "teamA": "PBV Bala Batu B",
     "teamB": "Maliba Simpang",
     "date": "2026-08-15",
@@ -951,8 +951,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-2",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "B",
-    "round": "Fase Grup B",
+    "group": "A",
+    "round": "Fase Grup A",
     "teamA": "MTs",
     "teamB": "Rante Limbong",
     "date": "2026-08-10",
@@ -967,8 +967,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-3",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "B",
-    "round": "Fase Grup B",
+    "group": "A",
+    "round": "Fase Grup A",
     "teamA": "Rante Limbong",
     "teamB": "Siduruk Tim",
     "date": "2026-08-11",
@@ -983,8 +983,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-4",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "A",
-    "round": "Fase Grup A",
+    "group": "C",
+    "round": "Fase Grup C",
     "teamA": "Buntu Kalosi",
     "teamB": "PBV Bala Batu A",
     "date": "2026-08-11",
@@ -999,8 +999,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-5",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "A",
-    "round": "Fase Grup A",
+    "group": "C",
+    "round": "Fase Grup C",
     "teamA": "Alloan Squad",
     "teamB": "Buntu Kalosi",
     "date": "2026-08-12",
@@ -1015,8 +1015,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-6",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "B",
-    "round": "Fase Grup B",
+    "group": "A",
+    "round": "Fase Grup A",
     "teamA": "MTs",
     "teamB": "Siduruk Tim",
     "date": "2026-08-12",
@@ -1031,8 +1031,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-7",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "C",
-    "round": "Fase Grup C",
+    "group": "D",
+    "round": "Fase Grup D",
     "teamA": "Buntu Ampalla",
     "teamB": "PBV Maliba",
     "date": "2026-08-13",
@@ -1047,8 +1047,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-8",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "D",
-    "round": "Fase Grup D",
+    "group": "B",
+    "round": "Fase Grup B",
     "teamA": "Maliba Simpang",
     "teamB": "SMPN 6 Alla",
     "date": "2026-08-13",
@@ -1063,8 +1063,8 @@ export const DEFAULT_MATCHES: Match[] = [
     "id": "vpi-9",
     "sport": "volly-putri",
     "phase": "group",
-    "group": "D",
-    "round": "Fase Grup D",
+    "group": "B",
+    "round": "Fase Grup B",
     "teamA": "SMPN 6 Alla",
     "teamB": "PBV Bala Batu B",
     "date": "2026-08-14",
@@ -1407,9 +1407,11 @@ export function getStandingsWithMatches(allMatches: Match[], sport: string): Rec
   const isBallSport = sport === 'sepak-bola-mini';
 
   const standingsMap: Record<string, Record<string, Standing>> = {};
+  const teamGroupMap: Record<string, string> = {};
 
   teams.forEach((t) => {
     const groupName = t.group || 'A';
+    teamGroupMap[t.name] = groupName;
     if (!standingsMap[groupName]) standingsMap[groupName] = {};
     standingsMap[groupName][t.name] = {
       name: t.name, played: 0, won: 0, lost: 0, draw: 0,
@@ -1422,26 +1424,29 @@ export function getStandingsWithMatches(allMatches: Match[], sport: string): Rec
     if (m.scoreA === null || m.scoreB === null) return;
     if (m.status !== 'finished' && m.status !== 'live') return;
 
-    const groupName = m.group || 'A';
     const teamA = m.teamA;
     const teamB = m.teamB;
 
-    if (!standingsMap[groupName]) standingsMap[groupName] = {};
-    if (!standingsMap[groupName][teamA]) {
-      standingsMap[groupName][teamA] = {
+    const groupA = teamGroupMap[teamA] || m.group || 'A';
+    const groupB = teamGroupMap[teamB] || m.group || 'A';
+
+    if (!standingsMap[groupA]) standingsMap[groupA] = {};
+    if (!standingsMap[groupA][teamA]) {
+      standingsMap[groupA][teamA] = {
         name: teamA, played: 0, won: 0, lost: 0, draw: 0,
         goalsFor: 0, goalsAgainst: 0, setsFor: 0, setsAgainst: 0, points: 0,
       };
     }
-    if (!standingsMap[groupName][teamB]) {
-      standingsMap[groupName][teamB] = {
+    if (!standingsMap[groupB]) standingsMap[groupB] = {};
+    if (!standingsMap[groupB][teamB]) {
+      standingsMap[groupB][teamB] = {
         name: teamB, played: 0, won: 0, lost: 0, draw: 0,
         goalsFor: 0, goalsAgainst: 0, setsFor: 0, setsAgainst: 0, points: 0,
       };
     }
 
-    const stA = standingsMap[groupName][teamA];
-    const stB = standingsMap[groupName][teamB];
+    const stA = standingsMap[groupA][teamA];
+    const stB = standingsMap[groupB][teamB];
 
     stA.played += 1;
     stB.played += 1;
@@ -1476,12 +1481,10 @@ export function getStandingsWithMatches(allMatches: Match[], sport: string): Rec
         stA.won += 1;
         stA.points += m.scoreA === 2 && m.scoreB === 0 ? 3 : 2;
         stB.lost += 1;
-        stB.points += m.scoreB === 1 ? 1 : 0;
       } else if (m.scoreB > m.scoreA) {
         stB.won += 1;
         stB.points += m.scoreB === 2 && m.scoreA === 0 ? 3 : 2;
         stA.lost += 1;
-        stA.points += m.scoreA === 1 ? 1 : 0;
       }
     }
   });
