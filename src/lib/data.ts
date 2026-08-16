@@ -24,12 +24,12 @@ export const DEFAULT_TEAMS: Record<string, Team[]> = {
     { id: "vp-4", name: "PBV Siduruk", group: "B" },
     { id: "vp-5", name: "Le'To Bara", group: "B" },
     { id: "vp-6", name: "PBV Masbro", group: "B" },
-    { id: "vp-7", name: "PBV Bunga Duri", group: "C" },
-    { id: "vp-8", name: "PBV Lamba", group: "C" },
-    { id: "vp-9", name: "PBV Bala Batu B", group: "C" },
-    { id: "vp-10", name: "MVC Malannying", group: "D" },
-    { id: "vp-11", name: "Solleakka Group", group: "D" },
-    { id: "vp-12", name: "PBV Bala Batu A", group: "D" }
+    { id: "vp-7", name: "MVC Malannying", group: "C" },
+    { id: "vp-8", name: "PBV Bala Batu A", group: "C" },
+    { id: "vp-9", name: "Solleakka Group", group: "C" },
+    { id: "vp-10", name: "PBV Bala Batu B", group: "D" },
+    { id: "vp-11", name: "PBV Bunga Duri", group: "D" },
+    { id: "vp-12", name: "PBV Lamba", group: "D" }
   ],
   "volly-putri": [
     { id: "vpi-1", name: "Alloan Squad", group: "A" },
