@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { Printer, Trophy, CheckCircle2, Award } from 'lucide-react';
+import { Printer, Trophy, CheckCircle2 } from 'lucide-react';
 import { getMatchesBySport, getStandings } from '@/lib/data';
 import type { Team } from '@/types';
 
@@ -25,14 +25,14 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   const groupC = standings['C'] || [];
   const groupD = standings['D'] || [];
 
-  const leaderA = groupA[0]?.name || 'Juara Full A';
-  const runnerA = groupA[1]?.name || 'Runner Up A';
-  const leaderB = groupB[0]?.name || 'Juara Full B';
-  const runnerB = groupB[1]?.name || 'Runner Up B';
-  const leaderC = groupC[0]?.name || 'Juara Full C';
-  const runnerC = groupC[1]?.name || 'Runner Up C';
-  const leaderD = groupD[0]?.name || 'Juara Full D';
-  const runnerD = groupD[1]?.name || 'Runner Up D';
+  const leaderA = groupA[0]?.played > 0 ? groupA[0].name : 'Juara Full A';
+  const runnerA = groupA[1]?.played > 0 ? groupA[1].name : 'Runner Up A';
+  const leaderB = groupB[0]?.played > 0 ? groupB[0].name : 'Juara Full B';
+  const runnerB = groupB[1]?.played > 0 ? groupB[1].name : 'Runner Up B';
+  const leaderC = groupC[0]?.played > 0 ? groupC[0].name : 'Juara Full C';
+  const runnerC = groupC[1]?.played > 0 ? groupC[1].name : 'Runner Up C';
+  const leaderD = groupD[0]?.played > 0 ? groupD[0].name : 'Juara Full D';
+  const runnerD = groupD[1]?.played > 0 ? groupD[1].name : 'Runner Up D';
 
   const isMiniFootball = sportId === 'sepak-bola-mini';
 
@@ -41,12 +41,16 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   const sfMatches = matches.filter((m) => m.phase === 'knockout' && m.round.toLowerCase().includes('semi'));
   const finalMatch = matches.find((m) => m.phase === 'knockout' && m.round.toLowerCase().includes('final'));
 
-  // QF Pairings (for Volly Putra & Volly Putri)
+  // QF Pairings (Exact diagram match for Volly)
+  // QF 1: Juara Full A vs Runner Up B
+  // QF 2: Juara Full C vs Runner Up D
+  // QF 3: Juara Full B vs Runner Up C
+  // QF 4: Juara Full D vs Runner Up A
   const qfPairs: [string, string][] = [
-    [leaderA, runnerB], // QF 1: Juara Full A vs Runner Up B
-    [leaderC, runnerD], // QF 2: Juara Full C vs Runner Up D
-    [leaderB, runnerC], // QF 3: Juara Full B vs Runner Up C
-    [leaderD, runnerA], // QF 4: Juara Full D vs Runner Up A
+    [leaderA, runnerB],
+    [leaderC, runnerD],
+    [leaderB, runnerC],
+    [leaderD, runnerA],
   ];
 
   // Check QF Winners
@@ -126,8 +130,8 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
         `M ${mx} ${y1} V ${y2} ` +
         `M ${mx} ${ty} H ${tx}`
       );
-      path.setAttribute('stroke', 'rgba(14, 165, 233, 0.35)');
-      path.setAttribute('stroke-width', '2');
+      path.setAttribute('stroke', '#94a3b8');
+      path.setAttribute('stroke-width', '1.5');
       path.setAttribute('fill', 'none');
       svg.appendChild(path);
     };
@@ -146,75 +150,69 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   }, [matches, standings, isMiniFootball]);
 
   return (
-    <div className="bg-[#0f1d32] rounded-2xl border border-white/[0.06] p-6 shadow-2xl space-y-8">
-      {/* Header Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/[0.06] no-print">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1">
-            <Trophy className="w-4 h-4" /> Bagan Sistem Gugur Real-Time
-          </div>
-          <h2 className="text-xl font-extrabold text-white">Bagan Turnamen – {sportName}</h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            {isMiniFootball
-              ? 'Sepak Bola Mini dimulai dari Babak Semi Final (4 Besar).'
-              : 'Volly Putra & Putri dimulai dari Babak 8 Besar (Perempat Final).'}
-          </p>
-        </div>
+    <div className="bg-[#0f1d32] rounded-2xl border border-white/[0.06] p-6 shadow-2xl space-y-6">
+      {/* Title & Toolbar */}
+      <div className="text-center space-y-1 pb-4 border-b border-white/[0.06] relative">
+        <h2 className="text-xl font-extrabold text-white uppercase tracking-wider">
+          BAGAN SISTEM GUGUR
+        </h2>
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+          PERTANDINGAN {sportName.toUpperCase()}
+        </p>
 
         <button
           onClick={() => window.print()}
-          className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-red-600/20 hover:scale-105"
+          className="absolute right-0 top-0 px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-lg no-print"
         >
-          <Printer className="w-4 h-4" />
-          Cetak Bagan A4
+          <Printer className="w-3.5 h-3.5" /> Cetak
         </button>
       </div>
 
       {/* Bracket Area */}
-      <div ref={containerRef} className="relative min-h-[460px] flex items-center justify-around px-2 sm:px-8 py-4">
+      <div ref={containerRef} className="relative min-h-[500px] flex items-center justify-around px-2 sm:px-6 py-4">
         <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
 
-        {/* Round 1: Perempat Final (Only for Volly Putra & Putri) */}
+        {/* Round 1: PEREMPAT FINAL (Volly Putra & Putri) */}
         {!isMiniFootball && (
-          <div className="relative z-10 flex flex-col justify-around space-y-6 w-48 sm:w-56">
-            <h3 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider text-center flex items-center justify-center gap-1.5 mb-2">
-              <Award className="w-4 h-4" /> Perempat Final (8 Besar)
+          <div className="relative z-10 flex flex-col justify-around space-y-8 w-52 sm:w-60">
+            <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
+              PEREMPAT FINAL
             </h3>
 
             {qfPairs.map((pair, idx) => {
               const m = qfMatches[idx];
-              const isFinished = m?.status === 'finished';
+              const scoreAStr = m?.scoreA !== null && m?.scoreA !== undefined ? String(m.scoreA) : '-';
+              const scoreBStr = m?.scoreB !== null && m?.scoreB !== undefined ? String(m.scoreB) : '-';
               const winner = m?.winner;
 
               return (
                 <div
                   key={idx}
                   id={`qf-${idx}`}
-                  className="bg-[#0a1628] border border-white/[0.08] rounded-xl overflow-hidden shadow-lg"
+                  className="bg-[#1a2942] border border-slate-700/60 rounded-xl overflow-hidden shadow-md space-y-0.5 p-1"
                 >
-                  <div className="px-3 py-1 bg-cyan-500/10 border-b border-white/[0.04] flex items-center justify-between text-[10px] text-cyan-400 font-bold">
-                    <span>QF {idx + 1}</span>
-                    {isFinished ? (
-                      <span className="text-emerald-400 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> Selesai
-                      </span>
-                    ) : (
-                      <span className="text-slate-400">{m?.time || 'TBD'}</span>
-                    )}
+                  {/* Team A */}
+                  <div
+                    className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                      winner === pair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                    }`}
+                  >
+                    <span className="text-xs font-semibold truncate max-w-[140px]">{pair[0]}</span>
+                    <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                      {scoreAStr}
+                    </span>
                   </div>
 
-                  <div className={`p-2.5 flex items-center justify-between border-b border-white/[0.04] ${
-                    winner === pair[0] ? 'bg-emerald-500/15 text-emerald-400 font-extrabold' : 'text-slate-200'
-                  }`}>
-                    <span className="text-xs font-semibold truncate">{pair[0]}</span>
-                    {winner === pair[0] && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />}
-                  </div>
-
-                  <div className={`p-2.5 flex items-center justify-between ${
-                    winner === pair[1] ? 'bg-emerald-500/15 text-emerald-400 font-extrabold' : 'text-slate-200'
-                  }`}>
-                    <span className="text-xs font-semibold truncate">{pair[1]}</span>
-                    {winner === pair[1] && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />}
+                  {/* Team B */}
+                  <div
+                    className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                      winner === pair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                    }`}
+                  >
+                    <span className="text-xs font-semibold truncate max-w-[140px]">{pair[1]}</span>
+                    <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                      {scoreBStr}
+                    </span>
                   </div>
                 </div>
               );
@@ -222,93 +220,102 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
           </div>
         )}
 
-        {/* Round 2: Semi Final */}
-        <div className="relative z-10 flex flex-col justify-around space-y-16 w-48 sm:w-56">
-          <h3 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider text-center flex items-center justify-center gap-1.5 mb-2">
-            <Award className="w-4 h-4" /> Semi Final
+        {/* Round 2: SEMI FINAL */}
+        <div className="relative z-10 flex flex-col justify-around space-y-24 w-52 sm:w-60">
+          <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
+            SEMI FINAL
           </h3>
 
           {sfPairs.map((pair, idx) => {
             const m = sfMatches[idx];
-            const isFinished = m?.status === 'finished';
+            const scoreAStr = m?.scoreA !== null && m?.scoreA !== undefined ? String(m.scoreA) : '-';
+            const scoreBStr = m?.scoreB !== null && m?.scoreB !== undefined ? String(m.scoreB) : '-';
             const winner = m?.winner;
 
             return (
               <div
                 key={idx}
                 id={`sf-${idx}`}
-                className="bg-[#0a1628] border border-cyan-500/30 rounded-xl overflow-hidden shadow-xl"
+                className="bg-[#1a2942] border border-slate-700/60 rounded-xl overflow-hidden shadow-md space-y-0.5 p-1"
               >
-                <div className="px-3 py-1 bg-cyan-500/15 border-b border-white/[0.04] flex items-center justify-between text-[10px] text-cyan-400 font-bold">
-                  <span>SF {idx + 1}</span>
-                  {isFinished ? (
-                    <span className="text-emerald-400 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" /> Selesai
-                    </span>
-                  ) : (
-                    <span className="text-slate-400">{m?.time || 'TBD'}</span>
-                  )}
+                {/* Team A */}
+                <div
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                    winner === pair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                  }`}
+                >
+                  <span className={`text-xs font-semibold truncate max-w-[140px] ${pair[0] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                    {pair[0]}
+                  </span>
+                  <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                    {scoreAStr}
+                  </span>
                 </div>
 
-                <div className={`p-2.5 flex items-center justify-between border-b border-white/[0.04] ${
-                  winner === pair[0] ? 'bg-emerald-500/15 text-emerald-400 font-extrabold' : 'text-slate-200'
-                }`}>
-                  <span className="text-xs font-semibold truncate">{pair[0]}</span>
-                  {winner === pair[0] && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />}
-                </div>
-
-                <div className={`p-2.5 flex items-center justify-between ${
-                  winner === pair[1] ? 'bg-emerald-500/15 text-emerald-400 font-extrabold' : 'text-slate-200'
-                }`}>
-                  <span className="text-xs font-semibold truncate">{pair[1]}</span>
-                  {winner === pair[1] && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />}
+                {/* Team B */}
+                <div
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                    winner === pair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                  }`}
+                >
+                  <span className={`text-xs font-semibold truncate max-w-[140px] ${pair[1] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                    {pair[1]}
+                  </span>
+                  <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                    {scoreBStr}
+                  </span>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Round 3: Final */}
-        <div className="relative z-10 flex flex-col justify-center space-y-4 w-48 sm:w-56">
-          <h3 className="text-xs font-extrabold text-red-400 uppercase tracking-wider text-center flex items-center justify-center gap-1.5 mb-2">
-            🏆 Grand Final
+        {/* Round 3: FINAL */}
+        <div className="relative z-10 flex flex-col justify-center space-y-4 w-52 sm:w-60">
+          <h3 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest text-center mb-1">
+            FINAL
           </h3>
 
           <div
             id="final-0"
-            className="bg-gradient-to-br from-[#0f1d32] to-[#0a1628] border-2 border-red-500/40 rounded-xl overflow-hidden shadow-2xl shadow-red-500/15"
+            className="bg-[#1a2942] border-2 border-red-500/40 rounded-xl overflow-hidden shadow-xl space-y-0.5 p-1"
           >
-            <div className="px-3 py-1.5 bg-red-500/15 border-b border-white/[0.04] flex items-center justify-between text-[10px] text-red-400 font-bold">
-              <span>Final</span>
-              {finalMatch?.status === 'finished' && (
-                <span className="text-emerald-400 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" /> Selesai
-                </span>
-              )}
+            {/* Team A */}
+            <div
+              className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                tournamentWinner === finalPair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+              }`}
+            >
+              <span className={`text-xs font-semibold truncate max-w-[140px] ${finalPair[0] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                {finalPair[0]}
+              </span>
+              <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                {finalMatch?.scoreA !== null && finalMatch?.scoreA !== undefined ? finalMatch.scoreA : '-'}
+              </span>
             </div>
 
-            <div className={`p-3 flex items-center justify-between border-b border-white/[0.04] ${
-              tournamentWinner === finalPair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200'
-            }`}>
-              <span className="text-xs font-semibold truncate">{finalPair[0]}</span>
-              {tournamentWinner === finalPair[0] && <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />}
-            </div>
-
-            <div className={`p-3 flex items-center justify-between ${
-              tournamentWinner === finalPair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200'
-            }`}>
-              <span className="text-xs font-semibold truncate">{finalPair[1]}</span>
-              {tournamentWinner === finalPair[1] && <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />}
+            {/* Team B */}
+            <div
+              className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                tournamentWinner === finalPair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+              }`}
+            >
+              <span className={`text-xs font-semibold truncate max-w-[140px] ${finalPair[1] === 'Tim...' ? 'italic text-slate-400' : ''}`}>
+                {finalPair[1]}
+              </span>
+              <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                {finalMatch?.scoreB !== null && finalMatch?.scoreB !== undefined ? finalMatch.scoreB : '-'}
+              </span>
             </div>
           </div>
 
           {/* Winner Banner */}
           {tournamentWinner && (
-            <div className="mt-4 text-center p-4 bg-gradient-to-r from-red-600/20 via-amber-500/20 to-red-600/20 border border-amber-500/40 rounded-xl shadow-lg animate-bounce">
+            <div className="mt-4 text-center p-3 bg-gradient-to-r from-red-600/20 via-amber-500/20 to-red-600/20 border border-amber-500/40 rounded-xl shadow-lg animate-bounce">
               <div className="text-[10px] uppercase font-extrabold text-amber-400 flex items-center justify-center gap-1">
-                <Trophy className="w-3.5 h-3.5" /> JUARA 1 TURNAMEN
+                <Trophy className="w-3.5 h-3.5" /> JUARA 1
               </div>
-              <div className="text-base font-extrabold text-white mt-1">{tournamentWinner}</div>
+              <div className="text-sm font-extrabold text-white mt-0.5">{tournamentWinner}</div>
             </div>
           )}
         </div>
