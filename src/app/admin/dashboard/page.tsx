@@ -4,9 +4,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Save, LogOut, CheckCircle2, Trophy, Calendar, Layers, Edit3,
-  Users, Plus, Trash2, Pencil, X, ChevronDown, Info, AlertCircle,
+  Users, Plus, Trash2, Pencil, X, ChevronDown, Info, AlertCircle, RefreshCw,
 } from 'lucide-react';
 import type { Match, EventData } from '@/types';
+import { getResolvedMatchesForList } from '@/lib/data';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 interface Team { id: string; name: string; sport_id: string; group: string; }
@@ -80,8 +81,17 @@ export default function AdminDashboardPage() {
 
   async function loadMatches() {
     const res = await fetch('/api/matches?t=' + Date.now(), { cache: 'no-store' });
-    if (res.ok) { const d = await res.json(); setMatches(d.matches || []); }
+    if (res.ok) {
+      const d = await res.json();
+      const resolved = getResolvedMatchesForList(d.matches || []);
+      setMatches(resolved);
+    }
   }
+
+  const handleSyncTeamsFromStandings = () => {
+    setMatches(prev => getResolvedMatchesForList(prev));
+    showToast('🔄 Tim Perempat Final/Semi Final berhasil disinkronkan dari klasemen!');
+  };
 
   async function loadTeams(sport: string) {
     setLoadingTeams(true);
@@ -282,6 +292,10 @@ export default function AdminDashboardPage() {
             <button onClick={handleSaveAll} disabled={saving}
               className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-lg hover:scale-105">
               <Save className="w-4 h-4" /> {saving ? 'Menyimpan...' : 'Simpan Semua ke Database'}
+            </button>
+            <button onClick={handleSyncTeamsFromStandings}
+              className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-lg hover:scale-105" title="Tarik nama tim Juara & Runner-Up dari klasemen secara otomatis">
+              <RefreshCw className="w-4 h-4" /> Sinkronkan Tim Lolos dari Klasemen
             </button>
             <button onClick={() => setShowAddMatch(v => !v)}
               className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-2 transition-all">
