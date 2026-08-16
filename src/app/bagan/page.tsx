@@ -1,16 +1,20 @@
 'use client';
 
-import { Suspense } from 'react';
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import BracketViewer from '@/components/BracketViewer';
-import { getEvent, getTeams } from '@/lib/data';
+import { getEvent, getTeams, fetchServerMatches } from '@/lib/data';
 
 function BaganContent() {
   const event = getEvent();
   const searchParams = useSearchParams();
   const initialSport = searchParams.get('sport') || 'volly-putra';
   const [selectedSport, setSelectedSport] = useState<string>(initialSport);
+
+  useEffect(() => {
+    // Fetch fresh database matches when opening /bagan page
+    fetchServerMatches();
+  }, [selectedSport]);
 
   const activeSportObj = event.sports.find((s) => s.id === selectedSport) || event.sports[0];
   const teams = getTeams(selectedSport);

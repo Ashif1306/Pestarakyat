@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Printer, Trophy, MoveHorizontal, Info, X } from 'lucide-react';
-import { getMatchesBySport, getStandings } from '@/lib/data';
-import type { Team } from '@/types';
+import { getMatchesBySport, getStandings, fetchServerMatches } from '@/lib/data';
+import type { Match, Standing, Team } from '@/types';
 
 interface BracketViewerProps {
   sportId?: string;
@@ -16,9 +16,24 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   const svgRef = useRef<SVGSVGElement>(null);
   const [showNotice, setShowNotice] = useState(false);
 
-  // 1. Fetch current matches and standings real-time
-  const matches = getMatchesBySport(sportId);
-  const standings = getStandings(sportId);
+  // 1. Live state for matches & standings (fetches directly from server DB)
+  const [matches, setMatches] = useState<Match[]>(getMatchesBySport(sportId));
+  const [standings, setStandings] = useState<Record<string, Standing[]>>(getStandings(sportId));
+
+  useEffect(() => {
+    // Synchronously set initial matches & standings
+    setMatches(getMatchesBySport(sportId));
+    setStandings(getStandings(sportId));
+
+    // Fetch fresh database matches from server API
+    fetchServerMatches().then((fresh) => {
+      if (fresh && Array.isArray(fresh) && fresh.length > 0) {
+        const filtered = fresh.filter((m) => m.sport === sportId);
+        setMatches(filtered);
+        setStandings(getStandings(sportId));
+      }
+    });
+  }, [sportId]);
 
   // 2. Determine Leaders & Runners-up from Group Stage
   const groupA = standings['A'] || [];
