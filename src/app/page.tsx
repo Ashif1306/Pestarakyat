@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Calendar, MapPin, Users, ArrowRight, Flame, Sparkles, Radio } from 'lucide-react';
+import { Calendar, MapPin, Users, ArrowRight, Flame, Sparkles, Radio, Coffee } from 'lucide-react';
 import SportCards from '@/components/SportCards';
 import MatchCard from '@/components/MatchCard';
 import KlasemenModalButton from '@/components/KlasemenModalButton';
+import WitaLiveClock from '@/components/WitaLiveClock';
 import { getEvent, getTodayMatches, getMatches } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
@@ -15,8 +16,8 @@ export default function HomePage() {
   // 1. Live Matches (Any match currently marked LIVE)
   const liveMatches = allMatches.filter((m) => m.status === 'live');
 
-  // 2. Today's Matches (15 Agustus 2026)
-  const todayMatches = getTodayMatches('2026-08-15');
+  // 2. Today's Matches (Dynamic based on WITA date)
+  const todayMatches = getTodayMatches();
   const todayScheduled = todayMatches.filter((m) => m.status === 'scheduled');
   const todayFinished = todayMatches.filter((m) => m.status === 'finished');
 
@@ -40,6 +41,11 @@ export default function HomePage() {
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 via-red-500 to-amber-400 opacity-80" />
 
         <div className="relative max-w-5xl mx-auto text-center space-y-8 z-10 py-16">
+          {/* Live WITA Clock */}
+          <div className="flex justify-center">
+            <WitaLiveClock />
+          </div>
+
           {/* Live Badge */}
           <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold uppercase tracking-wider shadow-lg shadow-red-500/10 animate-glow-pulse">
             <span className="relative flex h-2.5 w-2.5">
@@ -133,13 +139,13 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* SECTION 2: JADWAL HARI INI (AKAN DATANG) */}
+      {/* SECTION 2: JADWAL HARI INI / REST DAY (LIBUR) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1">
               <Sparkles className="w-4 h-4" />
-              Sabtu, 15 Agustus 2026
+              WAKTU INDONESIA TENGAH (WITA)
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Pertandingan Hari Ini</h2>
           </div>
@@ -153,8 +159,39 @@ export default function HomePage() {
         </div>
 
         {todayScheduled.length === 0 ? (
-          <div className="text-center py-10 bg-[#0f1d32] rounded-2xl border border-white/[0.06]">
-            <p className="text-slate-400 text-sm">Semua jadwal pertandingan hari ini sudah selesai atau sedang berlangsung.</p>
+          /* REST DAY (HARI INI LIBUR) CARD */
+          <div className="bg-gradient-to-br from-[#0f1d32] via-[#0a1628] to-[#0f1d32] rounded-3xl border border-amber-500/30 p-8 sm:p-12 text-center space-y-6 shadow-2xl shadow-amber-500/5 relative overflow-hidden">
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-extrabold uppercase tracking-widest shadow-md">
+              <Coffee className="w-4 h-4" /> HARI INI LIBUR PERTANDINGAN
+            </div>
+
+            <div className="space-y-2 max-w-xl mx-auto">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
+                Selamat Beristirahat! 🌴
+              </h3>
+              <p className="text-slate-300 text-sm leading-relaxed">
+                Hari ini tidak ada jadwal pertandingan yang berlangsung. Seluruh atlet dan panitia sedang beristirahat untuk mempersiapkan babak seru berikutnya.
+              </p>
+            </div>
+
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/jadwal"
+                className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg shadow-amber-500/20 hover:scale-105"
+              >
+                <Calendar className="w-4 h-4" />
+                Lihat Jadwal Pertandingan Mendatang
+              </Link>
+              <Link
+                href="/hasil"
+                className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center gap-2 transition-all border border-white/10"
+              >
+                Lihat Hasil Pertandingan Kemarin
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="space-y-10">
@@ -208,7 +245,7 @@ export default function HomePage() {
               Selesai Hari Ini ({todayFinished.length} Match)
             </h2>
             <Link href="/hasil" className="text-xs text-slate-400 hover:text-white flex items-center gap-1">
-              Lihat Semua Hasil <ArrowRight className="w-3 h-3" />
+              Lihat Semua Hasil <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

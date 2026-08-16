@@ -258,15 +258,22 @@ export function getFinishedMatchesBySport(sport: string): Match[] {
 }
 
 export function getTodayMatches(targetDate?: string): Match[] {
-  const dateStr = targetDate || '2026-08-15';
-  const matches = getMatches();
-  const todayList = matches.filter((m) => m.date === dateStr);
-  if (todayList.length === 0) {
-    const live = matches.filter((m) => m.status === 'live');
-    if (live.length > 0) return live;
-    return matches.filter((m) => m.status === 'scheduled').slice(0, 4);
+  let dateStr = targetDate;
+  if (!dateStr) {
+    try {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Makassar' }); // returns YYYY-MM-DD
+      dateStr = formatter.format(now);
+    } catch {
+      dateStr = '2026-08-16';
+    }
   }
-  return todayList;
+
+  const matches = getMatches();
+  const live = matches.filter((m) => m.status === 'live');
+  if (live.length > 0) return live;
+
+  return matches.filter((m) => m.date === dateStr);
 }
 
 export function getStandings(sport: string): Record<string, Standing[]> {
