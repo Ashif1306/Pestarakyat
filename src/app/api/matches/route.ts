@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDb, initDatabase } from '@/lib/db';
+import { DEFAULT_MATCHES } from '@/lib/data';
 
 function rowToMatch(r: any) {
   return {
@@ -24,20 +25,35 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const sport = searchParams.get('sport');
-    const sql = getDb();
-    await initDatabase();
+    
+    if (process.env.DATABASE_URL || process.env.POSTGRES_URL) {
+      try {
+        const sql = getDb();
+        await initDatabase();
 
-    const rows = sport
-      ? await sql`SELECT * FROM matches WHERE sport = ${sport} ORDER BY date, time`
-      : await sql`SELECT * FROM matches ORDER BY date, time`;
+        const rows = sport
+          ? await sql`SELECT * FROM matches WHERE sport = ${sport} ORDER BY date, time`
+          : await sql`SELECT * FROM matches ORDER BY date, time`;
 
+        if (rows && rows.length > 0) {
+          return NextResponse.json(
+            { matches: rows.map(rowToMatch), source: 'neon-postgres' },
+            { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+          );
+        }
+      } catch (e) {
+        console.warn('Neon DB query error in /api/matches:', e);
+      }
+    }
+
+    const filtered = sport ? DEFAULT_MATCHES.filter(m => m.sport === sport) : DEFAULT_MATCHES;
     return NextResponse.json(
-      { matches: rows.map(rowToMatch), source: 'neon-postgres' },
+      { matches: filtered, source: 'default-fallback' },
       { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
     );
   } catch (error) {
     console.error('GET /api/matches error:', error);
-    return NextResponse.json({ error: 'Failed to fetch matches' }, { status: 500 });
+    return NextResponse.json({ matches: DEFAULT_MATCHES, source: 'error-fallback' });
   }
 }
 

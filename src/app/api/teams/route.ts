@@ -1,28 +1,40 @@
 import { NextResponse } from 'next/server';
 import { getDb, initDatabase } from '@/lib/db';
+import { DEFAULT_TEAMS } from '@/lib/data';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const sport = searchParams.get('sport');
-    const sql = getDb();
-    await initDatabase();
 
-    const rows = sport
-      ? await sql`SELECT * FROM teams WHERE sport_id = ${sport} ORDER BY group_name, name`
-      : await sql`SELECT * FROM teams ORDER BY sport_id, group_name, name`;
+    if (process.env.DATABASE_URL || process.env.POSTGRES_URL) {
+      try {
+        const sql = getDb();
+        await initDatabase();
 
-    const teams = rows.map((r: any) => ({
-      id: r.id,
-      name: r.name,
-      sport_id: r.sport_id,
-      group: r.group_name,
-    }));
+        const rows = sport
+          ? await sql`SELECT * FROM teams WHERE sport_id = ${sport} ORDER BY group_name, name`
+          : await sql`SELECT * FROM teams ORDER BY sport_id, group_name, name`;
 
-    return NextResponse.json({ teams }, { headers: { 'Cache-Control': 'no-store' } });
+        if (rows && rows.length > 0) {
+          const teams = rows.map((r: any) => ({
+            id: r.id,
+            name: r.name,
+            sport_id: r.sport_id,
+            group: r.group_name,
+          }));
+          return NextResponse.json({ teams }, { headers: { 'Cache-Control': 'no-store' } });
+        }
+      } catch (e) {
+        console.warn('Neon DB query error in /api/teams:', e);
+      }
+    }
+
+    const fallbackTeams = sport ? DEFAULT_TEAMS[sport] || [] : Object.values(DEFAULT_TEAMS).flat();
+    return NextResponse.json({ teams: fallbackTeams }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     console.error('GET /api/teams error:', error);
-    return NextResponse.json({ error: 'Failed to fetch teams' }, { status: 500 });
+    return NextResponse.json({ teams: [] }, { status: 500 });
   }
 }
 

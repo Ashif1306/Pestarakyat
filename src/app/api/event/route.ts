@@ -1,39 +1,46 @@
 import { NextResponse } from 'next/server';
 import { getDb, initDatabase } from '@/lib/db';
+import { DEFAULT_EVENT } from '@/lib/data';
 
 export async function GET() {
   try {
-    const sql = getDb();
-    await initDatabase();
+    if (process.env.DATABASE_URL || process.env.POSTGRES_URL) {
+      try {
+        const sql = getDb();
+        await initDatabase();
 
-    const eventRows = await sql`SELECT * FROM event LIMIT 1`;
-    const sportsRows = await sql`SELECT * FROM sports ORDER BY id`;
+        const eventRows = await sql`SELECT * FROM event LIMIT 1`;
+        const sportsRows = await sql`SELECT * FROM sports ORDER BY id`;
 
-    if (!eventRows || eventRows.length === 0) {
-      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+        if (eventRows && eventRows.length > 0) {
+          const ev = eventRows[0];
+          return NextResponse.json({
+            name: ev.name,
+            tagline: ev.tagline,
+            description: ev.description,
+            startDate: ev.start_date,
+            endDate: ev.end_date,
+            location: ev.location,
+            organizer: ev.organizer,
+            sports: sportsRows.map((s: any) => ({
+              id: s.id,
+              name: s.name,
+              icon: s.icon,
+              color: s.color,
+              totalTeams: s.total_teams,
+              totalGroups: s.total_groups,
+            })),
+          }, { headers: { 'Cache-Control': 'no-store' } });
+        }
+      } catch (e) {
+        console.warn('Neon DB query error in /api/event:', e);
+      }
     }
 
-    const ev = eventRows[0];
-    return NextResponse.json({
-      name: ev.name,
-      tagline: ev.tagline,
-      description: ev.description,
-      startDate: ev.start_date,
-      endDate: ev.end_date,
-      location: ev.location,
-      organizer: ev.organizer,
-      sports: sportsRows.map((s: any) => ({
-        id: s.id,
-        name: s.name,
-        icon: s.icon,
-        color: s.color,
-        totalTeams: s.total_teams,
-        totalGroups: s.total_groups,
-      })),
-    }, { headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json(DEFAULT_EVENT, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     console.error('GET /api/event error:', error);
-    return NextResponse.json({ error: 'Failed to fetch event data' }, { status: 500 });
+    return NextResponse.json(DEFAULT_EVENT, { status: 500 });
   }
 }
 
