@@ -25,14 +25,14 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   const groupC = standings['C'] || [];
   const groupD = standings['D'] || [];
 
-  const leaderA = groupA[0]?.played > 0 ? groupA[0].name : 'Juara Full A';
-  const runnerA = groupA[1]?.played > 0 ? groupA[1].name : 'Runner Up A';
-  const leaderB = groupB[0]?.played > 0 ? groupB[0].name : 'Juara Full B';
-  const runnerB = groupB[1]?.played > 0 ? groupB[1].name : 'Runner Up B';
-  const leaderC = groupC[0]?.played > 0 ? groupC[0].name : 'Juara Full C';
-  const runnerC = groupC[1]?.played > 0 ? groupC[1].name : 'Runner Up C';
-  const leaderD = groupD[0]?.played > 0 ? groupD[0].name : 'Juara Full D';
-  const runnerD = groupD[1]?.played > 0 ? groupD[1].name : 'Runner Up D';
+  const leaderA = groupA[0]?.name || 'Juara Full A';
+  const runnerA = groupA[1]?.name || 'Runner Up A';
+  const leaderB = groupB[0]?.name || 'Juara Full B';
+  const runnerB = groupB[1]?.name || 'Runner Up B';
+  const leaderC = groupC[0]?.name || 'Juara Full C';
+  const runnerC = groupC[1]?.name || 'Runner Up C';
+  const leaderD = groupD[0]?.name || 'Juara Full D';
+  const runnerD = groupD[1]?.name || 'Runner Up D';
 
   const isMiniFootball = sportId === 'sepak-bola-mini';
 
@@ -41,12 +41,28 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   const sfMatches = matches.filter((m) => m.phase === 'knockout' && m.round.toLowerCase().includes('semi'));
   const finalMatch = matches.find((m) => m.phase === 'knockout' && m.round.toLowerCase().includes('final'));
 
+  // Helper: Get QF team (prioritize admin DB override, then standings position, then default placeholder)
+  const getQFTeam = (qfIndex: number, isTeamA: boolean, defaultPlaceholder: string, standingsTeam?: string) => {
+    const m = qfMatches[qfIndex];
+    if (m) {
+      const val = isTeamA ? m.teamA : m.teamB;
+      if (val && !val.toLowerCase().includes('juara') && !val.toLowerCase().includes('runner') && !val.toLowerCase().includes('pemenang')) {
+        return val;
+      }
+    }
+    return standingsTeam || defaultPlaceholder;
+  };
+
   // QF Pairings (Exact diagram match for Volly)
+  // QF 1: Juara Full A vs Runner Up B
+  // QF 2: Juara Full C vs Runner Up D
+  // QF 3: Juara Full B vs Runner Up C
+  // QF 4: Juara Full D vs Runner Up A
   const qfPairs: [string, string][] = [
-    [leaderA, runnerB],
-    [leaderC, runnerD],
-    [leaderB, runnerC],
-    [leaderD, runnerA],
+    [getQFTeam(0, true, 'Juara Full A', leaderA), getQFTeam(0, false, 'Runner Up B', runnerB)],
+    [getQFTeam(1, true, 'Juara Full C', leaderC), getQFTeam(1, false, 'Runner Up D', runnerD)],
+    [getQFTeam(2, true, 'Juara Full B', leaderB), getQFTeam(2, false, 'Runner Up C', runnerC)],
+    [getQFTeam(3, true, 'Juara Full D', leaderD), getQFTeam(3, false, 'Runner Up A', runnerA)],
   ];
 
   // Check QF Winners
@@ -60,13 +76,18 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   let sfPairs: [string, string][] = [];
   if (isMiniFootball) {
     sfPairs = [
-      [leaderA, runnerB],
-      [leaderB, runnerA],
+      [getQFTeam(0, true, 'Juara Full A', leaderA), getQFTeam(0, false, 'Runner Up B', runnerB)],
+      [getQFTeam(1, true, 'Juara Full B', leaderB), getQFTeam(1, false, 'Runner Up A', runnerA)],
     ];
   } else {
+    const sf1A = sfMatches[0]?.teamA && !sfMatches[0].teamA.toLowerCase().includes('pemenang') ? sfMatches[0].teamA : (qfWinners[0] || 'Tim...');
+    const sf1B = sfMatches[0]?.teamB && !sfMatches[0].teamB.toLowerCase().includes('pemenang') ? sfMatches[0].teamB : (qfWinners[1] || 'Tim...');
+    const sf2A = sfMatches[1]?.teamA && !sfMatches[1].teamA.toLowerCase().includes('pemenang') ? sfMatches[1].teamA : (qfWinners[2] || 'Tim...');
+    const sf2B = sfMatches[1]?.teamB && !sfMatches[1].teamB.toLowerCase().includes('pemenang') ? sfMatches[1].teamB : (qfWinners[3] || 'Tim...');
+
     sfPairs = [
-      [qfWinners[0] || 'Tim...', qfWinners[1] || 'Tim...'],
-      [qfWinners[2] || 'Tim...', qfWinners[3] || 'Tim...'],
+      [sf1A, sf1B],
+      [sf2A, sf2B],
     ];
   }
 
@@ -78,10 +99,10 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   });
 
   // Final Pair
-  const finalPair: [string, string] = [
-    sfWinners[0] || 'Tim...',
-    sfWinners[1] || 'Tim...',
-  ];
+  const finalA = finalMatch?.teamA && !finalMatch.teamA.toLowerCase().includes('pemenang') ? finalMatch.teamA : (sfWinners[0] || 'Tim...');
+  const finalB = finalMatch?.teamB && !finalMatch.teamB.toLowerCase().includes('pemenang') ? finalMatch.teamB : (sfWinners[1] || 'Tim...');
+
+  const finalPair: [string, string] = [finalA, finalB];
 
   // Tournament Winner
   const tournamentWinner = finalMatch?.status === 'finished' ? finalMatch.winner : null;
