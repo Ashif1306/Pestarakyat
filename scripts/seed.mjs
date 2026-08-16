@@ -18,6 +18,12 @@ async function seed() {
   // ── Create Tables ─────────────────────────────────────────────────────────
   console.log('📋 Membuat tabel...');
   await sql`
+    CREATE TABLE IF NOT EXISTS app_state (
+      id TEXT PRIMARY KEY,
+      data JSONB NOT NULL
+    )
+  `;
+  await sql`
     CREATE TABLE IF NOT EXISTS event (
       id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
@@ -229,13 +235,32 @@ async function seed() {
   }
   console.log(`✅ ${matches.length} pertandingan tersimpan!\n`);
 
+  // ALSO SYNC app_state TABLE WITH THE UPDATED MATCHES ARRAY!
+  const formattedMatches = matches.map(m => ({
+    id: m.id,
+    sport: m.sport,
+    phase: m.phase,
+    group: m.group_name,
+    round: m.round,
+    teamA: m.team_a,
+    teamB: m.team_b,
+    date: m.date,
+    time: m.time,
+    venue: m.venue,
+    status: m.status,
+    scoreA: m.score_a,
+    scoreB: m.score_b,
+    winner: m.winner,
+  }));
+
+  await sql`
+    INSERT INTO app_state (id, data)
+    VALUES ('pr_matches', ${JSON.stringify(formattedMatches)})
+    ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data
+  `;
+  console.log('✅ app_state (pr_matches) berhasil di-sync!\n');
+
   console.log('🎉 SELESAI! Semua data berhasil dipindahkan ke Neon Postgres!');
-  console.log('─────────────────────────────────────────────────');
-  console.log(`📅 Event    : 1 record`);
-  console.log(`🏅 Sports   : 3 records`);
-  console.log(`👥 Teams    : ${teams.length} records`);
-  console.log(`🏆 Matches  : ${matches.length} records`);
-  console.log('─────────────────────────────────────────────────');
 }
 
 seed().catch(err => {
