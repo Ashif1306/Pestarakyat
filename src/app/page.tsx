@@ -150,7 +150,7 @@ export default function HomePage() {
               <Sparkles className="w-4 h-4" />
               WAKTU BALABATU (WITA)
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Pertandingan Hari Ini</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Pertandingan Hari Ini</h2>
           </div>
           <Link
             href="/jadwal"
@@ -172,7 +172,7 @@ export default function HomePage() {
             </div>
 
             <div className="space-y-2 max-w-xl mx-auto">
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
                 Selamat Beristirahat! 🌴
               </h3>
               <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed font-medium">
