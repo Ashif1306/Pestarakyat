@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Printer, Trophy, MoveHorizontal, Info, X, Calendar } from 'lucide-react';
+import { Download, Trophy, MoveHorizontal, Info, X, Calendar, Loader2, CheckCircle2 } from 'lucide-react';
+import { toPng } from 'html-to-image';
 import { getMatchesBySport, getStandings, fetchServerMatches, getStandingsWithMatches } from '@/lib/data';
 import type { Match, Standing, Team } from '@/types';
 
@@ -14,7 +15,8 @@ interface BracketViewerProps {
 export default function BracketViewer({ sportId = 'volly-putra', sportName }: BracketViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const [showNotice, setShowNotice] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   // 1. Live state for matches & standings (fetches directly from server DB)
   const [matches, setMatches] = useState<Match[]>(getMatchesBySport(sportId));
@@ -197,8 +199,36 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
     };
   }, [matches, standings, isMiniFootball]);
 
-  const handlePrintClick = () => {
-    setShowNotice(true);
+  // Image Download Handler
+  const handleDownloadImage = async () => {
+    if (!containerRef.current) return;
+    try {
+      setDownloading(true);
+      setDownloadSuccess(false);
+
+      // Redraw lines to ensure crisp positioning
+      drawLines();
+
+      const dataUrl = await toPng(containerRef.current, {
+        cacheBust: true,
+        backgroundColor: '#0f1d32',
+        pixelRatio: 2, // High resolution HD PNG export
+      });
+
+      const cleanSportName = sportName.replace(/\s+/g, '-');
+      const link = document.createElement('a');
+      link.download = `Bagan-Sistem-Gugur-${cleanSportName}-Pesta-Rakyat.png`;
+      link.href = dataUrl;
+      link.click();
+
+      setDownloadSuccess(true);
+      setTimeout(() => setDownloadSuccess(false), 4000);
+    } catch (err) {
+      console.error('Error downloading bracket image:', err);
+      alert('Gagal mengunduh gambar bagan. Silakan coba beberapa saat lagi!');
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -221,36 +251,34 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
           </p>
         </div>
 
+        {/* Download Image Button */}
         <button
-          onClick={handlePrintClick}
-          className="px-4 py-2 rounded-xl bg-slate-700/80 hover:bg-slate-600 text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all shadow-md hover:scale-105 border border-white/10"
+          onClick={handleDownloadImage}
+          disabled={downloading}
+          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shadow-lg border hover:scale-105 ${
+            downloadSuccess
+              ? 'bg-emerald-600 text-white border-emerald-500'
+              : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border-emerald-400/40 shadow-emerald-600/20'
+          }`}
         >
-          <Printer className="w-3.5 h-3.5 text-amber-400" /> Cetak Bagan
+          {downloading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
+              <span>Mengunduh Gambar...</span>
+            </>
+          ) : downloadSuccess ? (
+            <>
+              <CheckCircle2 className="w-4 h-4 text-white" />
+              <span>Berhasil Diunduh!</span>
+            </>
+          ) : (
+            <>
+              <Download className="w-4 h-4 text-white" />
+              <span>Download Gambar Bagan (PNG)</span>
+            </>
+          )}
         </button>
       </div>
-
-      {/* Feature Disabled Notice Banner */}
-      {showNotice && (
-        <div className="bg-amber-500/15 border border-amber-500/40 rounded-xl p-4 flex items-start justify-between gap-3 text-amber-300 animate-fadeIn no-print">
-          <div className="flex items-start gap-2.5">
-            <Info className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <div className="text-xs font-extrabold uppercase tracking-wide text-amber-400">
-                Informasi Cetak Bagan
-              </div>
-              <p className="text-xs text-amber-200/90 leading-relaxed">
-                Fitur cetak bagan saat ini sedang dinonaktifkan sementara dan akan segera kembali. Terima kasih atas kesabarannya! 🙏
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowNotice(false)}
-            className="text-amber-400 hover:text-white p-1 rounded-lg hover:bg-amber-500/20 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
 
       {/* Mobile Scroll Hint Badge */}
       <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-cyan-400 bg-cyan-500/10 py-1.5 px-3.5 rounded-full border border-cyan-500/20 sm:hidden w-fit mx-auto">
