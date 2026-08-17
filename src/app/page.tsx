@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Calendar, MapPin, Users, ArrowRight, Flame, Sparkles, Radio, Coffee } from 'lucide-react';
 import SportCards from '@/components/SportCards';
@@ -5,20 +8,49 @@ import MatchCard from '@/components/MatchCard';
 import KlasemenModalButton from '@/components/KlasemenModalButton';
 import WitaLiveClock from '@/components/WitaLiveClock';
 import WelcomeToast from '@/components/WelcomeToast';
-import { getEvent, getTodayMatches, getMatches } from '@/lib/data';
+import { getEvent, getMatches, fetchServerMatches } from '@/lib/data';
+import type { Match } from '@/types';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+function getWitaTodayDateStr(): string {
+  try {
+    const formatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Makassar' });
+    return formatter.format(new Date());
+  } catch {
+    return new Date().toISOString().split('T')[0];
+  }
+}
 
 export default function HomePage() {
   const event = getEvent();
-  const allMatches = getMatches();
-  
+  const [allMatches, setAllMatches] = useState<Match[]>(getMatches());
+  const [todayWitaDate, setTodayWitaDate] = useState<string>(getWitaTodayDateStr());
+
+  useEffect(() => {
+    // 1. Initial fetch from server database
+    fetchServerMatches().then((list) => {
+      if (list && Array.isArray(list) && list.length > 0) {
+        setAllMatches(list);
+      }
+    });
+
+    // 2. Poll server database every 3s to stay 100% updated in real-time
+    const interval = setInterval(() => {
+      setTodayWitaDate(getWitaTodayDateStr());
+      fetchServerMatches().then((list) => {
+        if (list && Array.isArray(list) && list.length > 0) {
+          setAllMatches(list);
+        }
+      });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // 1. Live Matches (Any match currently marked LIVE)
   const liveMatches = allMatches.filter((m) => m.status === 'live');
 
-  // 2. Today's Matches (Dynamic based on WITA date)
-  const todayMatches = getTodayMatches();
+  // 2. Today's Matches (Filtered dynamically by exact WITA date)
+  const todayMatches = allMatches.filter((m) => m.date === todayWitaDate);
   const todayScheduled = todayMatches.filter((m) => m.status === 'scheduled');
   const todayFinished = todayMatches.filter((m) => m.status === 'finished');
 
