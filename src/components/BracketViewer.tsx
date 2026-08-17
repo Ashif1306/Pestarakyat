@@ -138,6 +138,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
     const svg = svgRef.current;
     svg.innerHTML = '';
     const svgRect = svg.getBoundingClientRect();
+    const isLight = document.documentElement.classList.contains('light');
 
     const drawConnectorPair = (
       card1Id: string,
@@ -172,7 +173,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
         `M ${mx} ${y1} V ${y2} ` +
         `M ${mx} ${midY} H ${tx}`
       );
-      path.setAttribute('stroke', '#38bdf8'); // Bright cyan accent
+      path.setAttribute('stroke', isLight ? '#0284c7' : '#38bdf8'); // Sky-600 for light mode, Sky-400 for dark mode
       path.setAttribute('stroke-width', '2');
       path.setAttribute('stroke-linecap', 'round');
       path.setAttribute('stroke-linejoin', 'round');
@@ -197,27 +198,21 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
     };
   }, [matches, standings, isMiniFootball]);
 
-  // Image Download Handler (High Contrast in both Dark and Light mode)
+  // Image Download Handler
   const handleDownloadImage = async () => {
     if (!containerRef.current) return;
-    const isLightMode = document.documentElement.classList.contains('light');
+    const isLight = document.documentElement.classList.contains('light');
 
     try {
       setDownloading(true);
       setDownloadSuccess(false);
 
-      // Temporarily remove light mode class during PNG capture to prevent black text overrides on dark canvas
-      if (isLightMode) {
-        document.documentElement.classList.remove('light');
-        document.documentElement.classList.add('dark');
-      }
-
-      // Redraw lines to ensure crisp positioning
+      // Redraw lines before capture
       drawLines();
 
       const dataUrl = await toPng(containerRef.current, {
         cacheBust: true,
-        backgroundColor: '#0f1d32',
+        backgroundColor: isLight ? '#f8fafc' : '#0f1d32',
         pixelRatio: 2, // High resolution HD PNG export
       });
 
@@ -233,24 +228,19 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       console.error('Error downloading bracket image:', err);
       alert('Gagal mengunduh gambar bagan. Silakan coba beberapa saat lagi!');
     } finally {
-      // Restore original theme class
-      if (isLightMode) {
-        document.documentElement.classList.add('light');
-        document.documentElement.classList.remove('dark');
-      }
       setDownloading(false);
     }
   };
 
   return (
-    <div className="bg-[#0f1d32] rounded-2xl border border-white/[0.06] p-4 sm:p-6 shadow-2xl space-y-4 sm:space-y-6">
+    <div className="bg-white dark:bg-[#0f1d32] rounded-2xl border border-slate-200 dark:border-white/[0.06] p-4 sm:p-6 shadow-2xl space-y-4 sm:space-y-6 transition-colors">
       {/* Title & Toolbar Header */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-4 border-b border-white/[0.06] no-print">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-white/[0.06] no-print">
         <div className="text-center sm:text-left space-y-1">
-          <h2 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wider">
+          <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
             BAGAN SISTEM GUGUR
           </h2>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
             PERTANDINGAN {sportName.toUpperCase()}
           </p>
         </div>
@@ -285,8 +275,8 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       </div>
 
       {/* Mobile Scroll Hint Badge */}
-      <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-cyan-400 bg-cyan-500/10 py-1.5 px-3.5 rounded-full border border-cyan-500/20 sm:hidden w-fit mx-auto">
-        <MoveHorizontal className="w-3.5 h-3.5 animate-pulse text-cyan-400" />
+      <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-cyan-700 dark:text-cyan-400 bg-cyan-500/10 py-1.5 px-3.5 rounded-full border border-cyan-500/20 sm:hidden w-fit mx-auto">
+        <MoveHorizontal className="w-3.5 h-3.5 animate-pulse text-cyan-600 dark:text-cyan-400" />
         <span>Geser ke samping untuk melihat seluruh bagan</span>
       </div>
 
@@ -294,16 +284,16 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       <div className="overflow-x-auto custom-scrollbar pb-6 pt-2">
         <div
           ref={containerRef}
-          className={`bracket-canvas relative flex flex-col items-center justify-center gap-6 px-6 py-6 rounded-2xl border border-white/10 ${
+          className={`bracket-canvas relative flex flex-col items-center justify-center gap-6 px-6 py-6 rounded-2xl bg-slate-100 dark:bg-[#0f1d32] border border-slate-300 dark:border-white/10 transition-colors ${
             isMiniFootball ? 'min-w-[560px]' : 'min-w-[860px]'
           }`}
         >
           {/* Official Image Header Title (Included in Downloaded PNG Image) */}
-          <div className="w-full text-center pb-4 border-b border-white/10 space-y-2 z-10">
-            <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider">
+          <div className="w-full text-center pb-4 border-b border-slate-300 dark:border-white/10 space-y-2 z-10">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-wider">
               BAGAN SISTEM GUGUR - PERTANDINGAN {sportName.toUpperCase()}
             </h2>
-            <p className="text-[10px] font-semibold tracking-wide max-w-2xl mx-auto uppercase">
+            <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400 tracking-wide max-w-2xl mx-auto uppercase">
               PANITIA PELAKSANA PESTA RAKYAT KKN IAIN PAREPARE POSKO 03 ANGKATAN 37 DESA BUNTU BARANA KOLABORASI PEMUDA BALABATU
             </p>
           </div>
@@ -319,7 +309,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                 {/* QF Group 1 */}
                 {!isMiniFootball && (
                   <div className="flex flex-col gap-6 w-56 sm:w-64 flex-shrink-0">
-                    <div className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-widest text-center">
+                    <div className="text-[11px] font-extrabold text-cyan-700 dark:text-cyan-400 uppercase tracking-widest text-center">
                       PEREMPAT FINAL (5 SET)
                     </div>
 
@@ -332,7 +322,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
 
                 {/* SF 0 */}
                 <div className="flex flex-col justify-center w-56 sm:w-64 flex-shrink-0">
-                  <div className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-widest text-center mb-2">
+                  <div className="text-[11px] font-extrabold text-cyan-700 dark:text-cyan-400 uppercase tracking-widest text-center mb-2">
                     SEMI FINAL {!isMiniFootball ? '(5 SET)' : ''}
                   </div>
                   {renderMatchCard(sfMatches[0], sfPairs[0], 'sf-0', sfPairs[0][0] === 'TBD', sfPairs[0][1] === 'TBD')}
@@ -360,35 +350,37 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
 
             {/* FINAL ROUND (Centered Right) */}
             <div className="relative z-10 flex flex-col justify-center w-56 sm:w-64 flex-shrink-0 self-center space-y-4">
-              <div className="text-[11px] font-extrabold text-amber-400 uppercase tracking-widest text-center mb-2">
+              <div className="text-[11px] font-extrabold text-amber-600 dark:text-amber-400 uppercase tracking-widest text-center mb-2">
                 FINAL {!isMiniFootball ? '(5 SET)' : ''}
               </div>
 
               <div
                 id="final-0"
-                className="bg-[#1a2942] border-2 border-amber-500/50 rounded-2xl overflow-hidden shadow-2xl p-2 space-y-1.5"
+                className="bg-white dark:bg-[#1a2942] border-2 border-amber-500/50 rounded-2xl overflow-hidden shadow-2xl p-2 space-y-1.5"
               >
                 {/* Match Date & Time */}
                 {finalMatch?.date && (
-                  <div className="flex items-center justify-between text-[10px] font-bold text-amber-400 px-2.5 py-1 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                  <div className="flex items-center justify-between text-[10px] font-bold text-amber-700 dark:text-amber-400 px-2.5 py-1 bg-amber-500/15 dark:bg-amber-500/10 rounded-lg border border-amber-500/30">
                     <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3 text-amber-400" />
+                      <Calendar className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                       {finalMatch.date}
                     </span>
-                    {finalMatch.time && <span className="font-mono text-slate-300">{finalMatch.time} WITA</span>}
+                    {finalMatch.time && <span className="font-mono text-slate-700 dark:text-slate-300">{finalMatch.time} WITA</span>}
                   </div>
                 )}
 
                 {/* Team A */}
                 <div
                   className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                    tournamentWinner === finalPair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                    tournamentWinner === finalPair[0]
+                      ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-extrabold'
+                      : 'text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-[#0f1d32]'
                   }`}
                 >
                   <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[0] === 'TBD' ? 'italic text-slate-400 font-bold' : ''}`}>
                     {finalPair[0]}
                   </span>
-                  <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                  <span className="w-6 h-6 rounded border border-slate-300 dark:border-slate-600/80 bg-slate-200 dark:bg-[#1e2d45] text-slate-900 dark:text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
                     {finalMatch?.scoreA !== null && finalMatch?.scoreA !== undefined ? finalMatch.scoreA : '-'}
                   </span>
                 </div>
@@ -396,13 +388,15 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                 {/* Team B */}
                 <div
                   className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                    tournamentWinner === finalPair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                    tournamentWinner === finalPair[1]
+                      ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-extrabold'
+                      : 'text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-[#0f1d32]'
                   }`}
                 >
                   <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[1] === 'TBD' ? 'italic text-slate-400 font-bold' : ''}`}>
                     {finalPair[1]}
                   </span>
-                  <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                  <span className="w-6 h-6 rounded border border-slate-300 dark:border-slate-600/80 bg-slate-200 dark:bg-[#1e2d45] text-slate-900 dark:text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
                     {finalMatch?.scoreB !== null && finalMatch?.scoreB !== undefined ? finalMatch.scoreB : '-'}
                   </span>
                 </div>
@@ -411,18 +405,18 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
               {/* Winner Banner */}
               {tournamentWinner && (
                 <div className="mt-4 text-center p-3 bg-gradient-to-r from-red-600/20 via-amber-500/20 to-red-600/20 border border-amber-500/40 rounded-xl shadow-lg animate-bounce">
-                  <div className="text-[10px] uppercase font-extrabold text-amber-400 flex items-center justify-center gap-1">
+                  <div className="text-[10px] uppercase font-extrabold text-amber-700 dark:text-amber-400 flex items-center justify-center gap-1">
                     <Trophy className="w-3.5 h-3.5" /> JUARA 1
                   </div>
-                  <div className="text-sm font-extrabold text-white mt-0.5">{tournamentWinner}</div>
+                  <div className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">{tournamentWinner}</div>
                 </div>
               )}
             </div>
           </div>
 
           {/* Note Footnote Banner (Included in Downloaded PNG Image) */}
-          <div className="w-full text-center pt-3 border-t border-white/10 z-10">
-            <p className="text-[11px] text-amber-400 font-semibold tracking-wide italic">
+          <div className="w-full text-center pt-3 border-t border-slate-300 dark:border-white/10 z-10">
+            <p className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold tracking-wide italic">
               * Note : Jadwal sewaktu-waktu dapat berubah tergantung dari kesepakatan panitia
             </p>
           </div>
@@ -447,29 +441,31 @@ function renderMatchCard(
   return (
     <div
       id={cardId}
-      className="bg-[#1a2942] border border-slate-700/70 rounded-2xl overflow-hidden shadow-lg p-2 space-y-1.5 transition-all hover:border-cyan-500/40"
+      className="bg-white dark:bg-[#1a2942] border border-slate-300 dark:border-slate-700/70 rounded-2xl overflow-hidden shadow-lg p-2 space-y-1.5 transition-all hover:border-cyan-500/40"
     >
       {/* Match Date & Time */}
       {m?.date && (
-        <div className="flex items-center justify-between text-[10px] font-bold text-cyan-400 px-2.5 py-1 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
+        <div className="flex items-center justify-between text-[10px] font-bold text-cyan-700 dark:text-cyan-400 px-2.5 py-1 bg-cyan-500/15 dark:bg-cyan-500/10 rounded-lg border border-cyan-500/30">
           <span className="flex items-center gap-1">
-            <Calendar className="w-3 h-3 text-cyan-400" />
+            <Calendar className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
             {m.date}
           </span>
-          {m.time && <span className="font-mono text-slate-300">{m.time} WITA</span>}
+          {m.time && <span className="font-mono text-slate-700 dark:text-slate-300">{m.time} WITA</span>}
         </div>
       )}
 
       {/* Team A */}
       <div
         className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-          winner === pair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+          winner === pair[0]
+            ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-extrabold'
+            : 'text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-[#0f1d32]'
         }`}
       >
         <span className={`text-xs font-semibold truncate max-w-[130px] ${isTbdA ? 'italic text-slate-400 font-bold' : ''}`}>
           {pair[0]}
         </span>
-        <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+        <span className="w-6 h-6 rounded border border-slate-300 dark:border-slate-600/80 bg-slate-200 dark:bg-[#1e2d45] text-slate-900 dark:text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
           {scoreAStr}
         </span>
       </div>
@@ -477,13 +473,15 @@ function renderMatchCard(
       {/* Team B */}
       <div
         className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-          winner === pair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+          winner === pair[1]
+            ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-extrabold'
+            : 'text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-[#0f1d32]'
         }`}
       >
         <span className={`text-xs font-semibold truncate max-w-[130px] ${isTbdB ? 'italic text-slate-400 font-bold' : ''}`}>
           {pair[1]}
         </span>
-        <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+        <span className="w-6 h-6 rounded border border-slate-300 dark:border-slate-600/80 bg-slate-200 dark:bg-[#1e2d45] text-slate-900 dark:text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
           {scoreBStr}
         </span>
       </div>

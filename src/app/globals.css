@@ -115,32 +115,19 @@ html.light [id^="sf-"] .text-slate-200 {
 }
 
 /* High Contrast Text & Accent Colors in Light Mode */
-html.light .text-white:not(.bg-red-600):not(.bg-red-700):not(.bg-emerald-600):not(.bg-blue-600):not(.bracket-canvas *):not(.bracket-canvas) {
+html.light .text-white:not(.bg-red-600):not(.bg-red-700):not(.bg-emerald-600):not(.bg-blue-600) {
   color: #0f172a !important;
 }
 
-.bracket-canvas {
-  background-color: #0f1d32 !important;
-  color: #f8fafc !important;
-}
-
-.bracket-canvas h2 {
-  color: #ffffff !important;
-}
-
-.bracket-canvas p {
-  color: #94a3b8 !important;
-}
-
-html.light .text-slate-200:not(.bracket-canvas *):not(.bracket-canvas) {
+html.light .text-slate-200 {
   color: #1e293b !important;
 }
 
-html.light .text-slate-300:not(.bracket-canvas *):not(.bracket-canvas) {
+html.light .text-slate-300 {
   color: #334155 !important;
 }
 
-html.light .text-slate-400:not(.bracket-canvas *):not(.bracket-canvas) {
+html.light .text-slate-400 {
   color: #475569 !important;
 }
 
