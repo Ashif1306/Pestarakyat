@@ -88,9 +88,27 @@ export default function AdminDashboardPage() {
     }
   }
 
-  const handleSyncTeamsFromStandings = () => {
-    setMatches(prev => getResolvedMatchesForList(prev));
-    showToast('🔄 Tim Perempat Final/Semi Final berhasil disinkronkan dari klasemen!');
+  const handleSyncTeamsFromStandings = async () => {
+    setSaving(true);
+    const resolved = getResolvedMatchesForList(matches, true);
+    setMatches(resolved);
+
+    try {
+      const res = await fetch('/api/matches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matches: resolved }),
+      });
+      if (res.ok) {
+        showToast('🔄 Tim Perempat Final/Semi Final berhasil disinkronkan dari klasemen & disimpan ke Database!');
+      } else {
+        showToast('Gagal menyimpan sinkronisasi ke database!', false);
+      }
+    } catch {
+      showToast('Error koneksi saat sinkronisasi!', false);
+    } finally {
+      setSaving(false);
+    }
   };
 
   async function loadTeams(sport: string) {

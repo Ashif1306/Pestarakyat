@@ -70,16 +70,18 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
     return true;
   };
 
-  // Helper: Get QF team (prioritize admin DB override, then standings position, then default placeholder)
+  // Helper: Get QF team (prioritize live group standings, then admin DB override, then default placeholder)
   const getQFTeam = (qfIndex: number, isTeamA: boolean, defaultPlaceholder: string, standingsTeam?: string) => {
     const m = qfMatches[qfIndex];
-    if (m) {
-      const val = isTeamA ? m.teamA : m.teamB;
-      if (isRealTeam(val)) {
-        return val;
-      }
+    const dbVal = m ? (isTeamA ? m.teamA : m.teamB) : null;
+
+    if (isRealTeam(standingsTeam)) {
+      return standingsTeam!;
     }
-    return standingsTeam || defaultPlaceholder;
+    if (isRealTeam(dbVal)) {
+      return dbVal!;
+    }
+    return defaultPlaceholder;
   };
 
   // QF Pairings (Exact diagram match for Volly)

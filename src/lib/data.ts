@@ -1285,7 +1285,7 @@ export function saveMatches(matches: Match[]) {
 
 // ─── Dynamic Knockout Team Resolver ──────────────────────────────────────────
 
-export function getResolvedMatchesForList(matches: Match[]): Match[] {
+export function getResolvedMatchesForList(matches: Match[], forceSync: boolean = false): Match[] {
   const sportsToResolve = ['volly-putra', 'volly-putri', 'sepak-bola-mini'];
   const standingsMap: Record<string, Record<string, Standing[]>> = {};
 
@@ -1325,26 +1325,26 @@ export function getResolvedMatchesForList(matches: Match[]): Match[] {
 
     if (roundLower.includes('perempat') || m.id.includes('-qf')) {
       if (m.id.endsWith('qf1')) {
-        teamA = isRealTeam(m.teamA) ? m.teamA : leaderA;
-        teamB = isRealTeam(m.teamB) ? m.teamB : runnerB;
+        teamA = forceSync || !isRealTeam(m.teamA) ? leaderA : m.teamA;
+        teamB = forceSync || !isRealTeam(m.teamB) ? runnerB : m.teamB;
       } else if (m.id.endsWith('qf2')) {
-        teamA = isRealTeam(m.teamA) ? m.teamA : leaderC;
-        teamB = isRealTeam(m.teamB) ? m.teamB : runnerD;
+        teamA = forceSync || !isRealTeam(m.teamA) ? leaderC : m.teamA;
+        teamB = forceSync || !isRealTeam(m.teamB) ? runnerD : m.teamB;
       } else if (m.id.endsWith('qf3')) {
-        teamA = isRealTeam(m.teamA) ? m.teamA : leaderB;
-        teamB = isRealTeam(m.teamB) ? m.teamB : runnerC;
+        teamA = forceSync || !isRealTeam(m.teamA) ? leaderB : m.teamA;
+        teamB = forceSync || !isRealTeam(m.teamB) ? runnerC : m.teamB;
       } else if (m.id.endsWith('qf4')) {
-        teamA = isRealTeam(m.teamA) ? m.teamA : leaderD;
-        teamB = isRealTeam(m.teamB) ? m.teamB : runnerA;
+        teamA = forceSync || !isRealTeam(m.teamA) ? leaderD : m.teamA;
+        teamB = forceSync || !isRealTeam(m.teamB) ? runnerA : m.teamA;
       }
     } else if (roundLower.includes('semi') || m.id.includes('-sf')) {
       if (s === 'sepak-bola-mini') {
         if (m.id.endsWith('sf1')) {
-          teamA = isRealTeam(m.teamA) ? m.teamA : leaderA;
-          teamB = isRealTeam(m.teamB) ? m.teamB : runnerB;
+          teamA = forceSync || !isRealTeam(m.teamA) ? leaderA : m.teamA;
+          teamB = forceSync || !isRealTeam(m.teamB) ? runnerB : m.teamB;
         } else if (m.id.endsWith('sf2')) {
-          teamA = isRealTeam(m.teamA) ? m.teamA : leaderB;
-          teamB = isRealTeam(m.teamB) ? m.teamB : runnerA;
+          teamA = forceSync || !isRealTeam(m.teamA) ? leaderB : m.teamA;
+          teamB = forceSync || !isRealTeam(m.teamB) ? runnerA : m.teamB;
         }
       }
     }
