@@ -290,117 +290,138 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       <div className="overflow-x-auto custom-scrollbar pb-6 pt-2">
         <div
           ref={containerRef}
-          className={`relative flex items-center justify-center gap-10 sm:gap-14 px-6 py-6 ${
-            isMiniFootball ? 'min-w-[540px]' : 'min-w-[840px]'
+          className={`relative flex flex-col items-center justify-center gap-6 px-6 py-6 bg-[#0f1d32] ${
+            isMiniFootball ? 'min-w-[560px]' : 'min-w-[860px]'
           }`}
         >
-          <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
-
-          {/* Symmetrical 2-Branch Layout Container */}
-          <div className="relative z-10 flex flex-col justify-center gap-12 sm:gap-16">
-            {/* TOP BRANCH: QF 0 & QF 1 -> SF 0 */}
-            <div className="flex items-center gap-10 sm:gap-14">
-              {/* QF Group 1 */}
-              {!isMiniFootball && (
-                <div className="flex flex-col gap-6 w-56 sm:w-64 flex-shrink-0">
-                  <div className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-widest text-center">
-                    PEREMPAT FINAL (5 SET)
-                  </div>
-
-                  {/* QF 0 */}
-                  {renderMatchCard(qfMatches[0], qfPairs[0], 'qf-0')}
-                  {/* QF 1 */}
-                  {renderMatchCard(qfMatches[1], qfPairs[1], 'qf-1')}
-                </div>
-              )}
-
-              {/* SF 0 */}
-              <div className="flex flex-col justify-center w-56 sm:w-64 flex-shrink-0">
-                <div className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-widest text-center mb-2">
-                  SEMI FINAL {!isMiniFootball ? '(5 SET)' : ''}
-                </div>
-                {renderMatchCard(sfMatches[0], sfPairs[0], 'sf-0', sfPairs[0][0] === 'TBD', sfPairs[0][1] === 'TBD')}
-              </div>
+          {/* Official Image Header Title (Included in Downloaded PNG Image) */}
+          <div className="w-full text-center pb-4 border-b border-white/10 space-y-2 z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-extrabold uppercase tracking-widest">
+              🏆 PESTA RAKYAT X KKN IAIN PAREPARE 2026
             </div>
-
-            {/* BOTTOM BRANCH: QF 2 & QF 3 -> SF 1 */}
-            <div className="flex items-center gap-10 sm:gap-14">
-              {/* QF Group 2 */}
-              {!isMiniFootball && (
-                <div className="flex flex-col gap-6 w-56 sm:w-64 flex-shrink-0">
-                  {/* QF 2 */}
-                  {renderMatchCard(qfMatches[2], qfPairs[2], 'qf-2')}
-                  {/* QF 3 */}
-                  {renderMatchCard(qfMatches[3], qfPairs[3], 'qf-3')}
-                </div>
-              )}
-
-              {/* SF 1 */}
-              <div className="flex flex-col justify-center w-56 sm:w-64 flex-shrink-0">
-                {renderMatchCard(sfMatches[1], sfPairs[1], 'sf-1', sfPairs[1][0] === 'TBD', sfPairs[1][1] === 'TBD')}
-              </div>
-            </div>
-          </div>
-
-          {/* FINAL ROUND (Centered Right) */}
-          <div className="relative z-10 flex flex-col justify-center w-56 sm:w-64 flex-shrink-0 self-center space-y-4">
-            <div className="text-[11px] font-extrabold text-amber-400 uppercase tracking-widest text-center mb-2">
-              FINAL {!isMiniFootball ? '(5 SET)' : ''}
-            </div>
-
-            <div
-              id="final-0"
-              className="bg-[#1a2942] border-2 border-amber-500/50 rounded-2xl overflow-hidden shadow-2xl p-2 space-y-1.5"
-            >
-              {/* Match Date & Time */}
-              {finalMatch?.date && (
-                <div className="flex items-center justify-between text-[10px] font-bold text-amber-400 px-2.5 py-1 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-amber-400" />
-                    {finalMatch.date}
-                  </span>
-                  {finalMatch.time && <span className="font-mono text-slate-300">{finalMatch.time} WITA</span>}
-                </div>
-              )}
-
-              {/* Team A */}
-              <div
-                className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                  tournamentWinner === finalPair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
-                }`}
-              >
-                <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[0] === 'TBD' ? 'italic text-slate-400 font-bold' : ''}`}>
-                  {finalPair[0]}
-                </span>
-                <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
-                  {finalMatch?.scoreA !== null && finalMatch?.scoreA !== undefined ? finalMatch.scoreA : '-'}
-                </span>
-              </div>
-
-              {/* Team B */}
-              <div
-                className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                  tournamentWinner === finalPair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
-                }`}
-              >
-                <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[1] === 'TBD' ? 'italic text-slate-400 font-bold' : ''}`}>
-                  {finalPair[1]}
-                </span>
-                <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
-                  {finalMatch?.scoreB !== null && finalMatch?.scoreB !== undefined ? finalMatch.scoreB : '-'}
-                </span>
-              </div>
-            </div>
-
-            {/* Winner Banner */}
-            {tournamentWinner && (
-              <div className="mt-4 text-center p-3 bg-gradient-to-r from-red-600/20 via-amber-500/20 to-red-600/20 border border-amber-500/40 rounded-xl shadow-lg animate-bounce">
-                <div className="text-[10px] uppercase font-extrabold text-amber-400 flex items-center justify-center gap-1">
-                  <Trophy className="w-3.5 h-3.5" /> JUARA 1
-                </div>
-                <div className="text-sm font-extrabold text-white mt-0.5">{tournamentWinner}</div>
+            <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider">
+              BAGAN SISTEM GUGUR - PERTANDINGAN {sportName.toUpperCase()}
+            </h2>
+            {!isMiniFootball && (
+              <div className="text-xs font-extrabold text-amber-400 uppercase tracking-widest">
+                ⚡ BABAK KNOCKOUT BEST OF 5 SETS (FORMAT 5 SET)
               </div>
             )}
+            <p className="text-[10px] text-slate-400 font-semibold tracking-wide max-w-2xl mx-auto uppercase">
+              PANITIA PELAKSANA PESTA RAKYAT KKN IAIN PAREPARE POSKO 03 ANGKATAN 37 DESA BUNTU BARANA KOLABORASI PEMUDA BALABATU
+            </p>
+          </div>
+
+          {/* SVG Connector Lines Container */}
+          <div className="relative w-full flex items-center justify-center gap-10 sm:gap-14 pt-2">
+            <svg ref={svgRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
+
+            {/* Symmetrical 2-Branch Layout Container */}
+            <div className="relative z-10 flex flex-col justify-center gap-12 sm:gap-16">
+              {/* TOP BRANCH: QF 0 & QF 1 -> SF 0 */}
+              <div className="flex items-center gap-10 sm:gap-14">
+                {/* QF Group 1 */}
+                {!isMiniFootball && (
+                  <div className="flex flex-col gap-6 w-56 sm:w-64 flex-shrink-0">
+                    <div className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-widest text-center">
+                      PEREMPAT FINAL (5 SET)
+                    </div>
+
+                    {/* QF 0 */}
+                    {renderMatchCard(qfMatches[0], qfPairs[0], 'qf-0')}
+                    {/* QF 1 */}
+                    {renderMatchCard(qfMatches[1], qfPairs[1], 'qf-1')}
+                  </div>
+                )}
+
+                {/* SF 0 */}
+                <div className="flex flex-col justify-center w-56 sm:w-64 flex-shrink-0">
+                  <div className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-widest text-center mb-2">
+                    SEMI FINAL {!isMiniFootball ? '(5 SET)' : ''}
+                  </div>
+                  {renderMatchCard(sfMatches[0], sfPairs[0], 'sf-0', sfPairs[0][0] === 'TBD', sfPairs[0][1] === 'TBD')}
+                </div>
+              </div>
+
+              {/* BOTTOM BRANCH: QF 2 & QF 3 -> SF 1 */}
+              <div className="flex items-center gap-10 sm:gap-14">
+                {/* QF Group 2 */}
+                {!isMiniFootball && (
+                  <div className="flex flex-col gap-6 w-56 sm:w-64 flex-shrink-0">
+                    {/* QF 2 */}
+                    {renderMatchCard(qfMatches[2], qfPairs[2], 'qf-2')}
+                    {/* QF 3 */}
+                    {renderMatchCard(qfMatches[3], qfPairs[3], 'qf-3')}
+                  </div>
+                )}
+
+                {/* SF 1 */}
+                <div className="flex flex-col justify-center w-56 sm:w-64 flex-shrink-0">
+                  {renderMatchCard(sfMatches[1], sfPairs[1], 'sf-1', sfPairs[1][0] === 'TBD', sfPairs[1][1] === 'TBD')}
+                </div>
+              </div>
+            </div>
+
+            {/* FINAL ROUND (Centered Right) */}
+            <div className="relative z-10 flex flex-col justify-center w-56 sm:w-64 flex-shrink-0 self-center space-y-4">
+              <div className="text-[11px] font-extrabold text-amber-400 uppercase tracking-widest text-center mb-2">
+                FINAL {!isMiniFootball ? '(5 SET)' : ''}
+              </div>
+
+              <div
+                id="final-0"
+                className="bg-[#1a2942] border-2 border-amber-500/50 rounded-2xl overflow-hidden shadow-2xl p-2 space-y-1.5"
+              >
+                {/* Match Date & Time */}
+                {finalMatch?.date && (
+                  <div className="flex items-center justify-between text-[10px] font-bold text-amber-400 px-2.5 py-1 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-amber-400" />
+                      {finalMatch.date}
+                    </span>
+                    {finalMatch.time && <span className="font-mono text-slate-300">{finalMatch.time} WITA</span>}
+                  </div>
+                )}
+
+                {/* Team A */}
+                <div
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                    tournamentWinner === finalPair[0] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                  }`}
+                >
+                  <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[0] === 'TBD' ? 'italic text-slate-400 font-bold' : ''}`}>
+                    {finalPair[0]}
+                  </span>
+                  <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                    {finalMatch?.scoreA !== null && finalMatch?.scoreA !== undefined ? finalMatch.scoreA : '-'}
+                  </span>
+                </div>
+
+                {/* Team B */}
+                <div
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                    tournamentWinner === finalPair[1] ? 'bg-emerald-500/20 text-emerald-400 font-extrabold' : 'text-slate-200 bg-[#0f1d32]'
+                  }`}
+                >
+                  <span className={`text-xs font-semibold truncate max-w-[130px] ${finalPair[1] === 'TBD' ? 'italic text-slate-400 font-bold' : ''}`}>
+                    {finalPair[1]}
+                  </span>
+                  <span className="w-6 h-6 rounded border border-slate-600/80 bg-[#1e2d45] text-slate-300 font-bold text-xs flex items-center justify-center ml-2 flex-shrink-0">
+                    {finalMatch?.scoreB !== null && finalMatch?.scoreB !== undefined ? finalMatch.scoreB : '-'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Winner Banner */}
+              {tournamentWinner && (
+                <div className="mt-4 text-center p-3 bg-gradient-to-r from-red-600/20 via-amber-500/20 to-red-600/20 border border-amber-500/40 rounded-xl shadow-lg animate-bounce">
+                  <div className="text-[10px] uppercase font-extrabold text-amber-400 flex items-center justify-center gap-1">
+                    <Trophy className="w-3.5 h-3.5" /> JUARA 1
+                  </div>
+                  <div className="text-sm font-extrabold text-white mt-0.5">{tournamentWinner}</div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
