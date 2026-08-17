@@ -419,6 +419,13 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
               )}
             </div>
           </div>
+
+          {/* Note Footnote Banner (Included in Downloaded PNG Image) */}
+          <div className="w-full text-center pt-3 border-t border-white/10 z-10">
+            <p className="text-[11px] text-amber-400 font-semibold tracking-wide italic">
+              * Note : Jadwal sewaktu-waktu dapat berubah tergantung dari kesepakatan panitia
+            </p>
+          </div>
         </div>
       </div>
     </div>
