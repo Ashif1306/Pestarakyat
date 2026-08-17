@@ -29,7 +29,7 @@ export default function HomePage() {
   });
 
   return (
-    <div className="space-y-20 pb-16">
+    <div className="space-y-8 sm:space-y-20 pb-16">
       {/* 3-Second Welcome Onboarding Toast */}
       <WelcomeToast />
       {/* Hero Section */}
