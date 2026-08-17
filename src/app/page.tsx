@@ -33,7 +33,7 @@ export default function HomePage() {
       {/* 3-Second Welcome Onboarding Toast */}
       <WelcomeToast />
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-white/[0.06] bg-[#0a1628] px-4">
+      <section className="relative min-h-[70vh] sm:min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-white/[0.06] bg-[#0a1628] px-4">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-600/15 via-transparent to-transparent pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-red-600/10 via-transparent to-transparent pointer-events-none" />
@@ -43,7 +43,7 @@ export default function HomePage() {
         {/* Red-White stripe header accent */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 via-red-500 to-amber-400 opacity-80" />
 
-        <div className="relative max-w-5xl mx-auto text-center space-y-8 z-10 py-16">
+        <div className="relative max-w-5xl mx-auto text-center space-y-5 sm:space-y-8 z-10 pt-4 pb-10 sm:py-16">
           {/* Live WITA Clock */}
           <div className="flex justify-center">
             <WitaLiveClock />
