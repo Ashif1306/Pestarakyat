@@ -70,8 +70,8 @@ export default function HomePage() {
             {event.description}
           </p>
 
-          {/* Location & Dates */}
-          <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-slate-300 font-medium">
+          {/* Location & Dates (Hidden on mobile to prevent confusion with buttons) */}
+          <div className="hidden sm:flex flex-wrap items-center justify-center gap-4 text-sm text-slate-300 font-medium">
             <div className="flex items-center gap-2 bg-[#0f1d32] px-4 py-2.5 rounded-xl border border-white/[0.06] shadow-sm">
               <Calendar className="w-4 h-4 text-cyan-400" />
               10 – 25 Agustus 2026
