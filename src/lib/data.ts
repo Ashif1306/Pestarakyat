@@ -6,8 +6,8 @@ export const DEFAULT_EVENT: EventData = {
   startDate: "2026-08-14",
   endDate: "2026-08-25",
   location: "Dusun Bala Batu, Desa Buntu Barana, Kec. Curio, Kab. Enrekang",
-  organizer: "KKN IAIN Parepare Angkatan X Posko Dusun Bala Batu",
-  description: "Turnamen olahraga Pesta Rakyat diselenggarakan oleh KKN IAIN Parepare Angkatan X Posko Dusun Bala Batu untuk mempererat tali silaturahmi dan semangat kemerdekaan.",
+  organizer: "KKN IAIN Parepare Posko 03 Angkatan 37 Dusun Bala Batu",
+  description: "PANITIA PELAKSANA PESTA RAKYAT KKN IAIN PAREPARE POSKO 03 ANGKATAN 37 DESA BUNTU BARANA KOLABORASI PEMUDA BALABATU",
   sports: [
     { id: "volly-putra", name: "Volly Putra", icon: "🏐", color: "#0ea5e9", totalTeams: 12, totalGroups: 4 },
     { id: "volly-putri", name: "Volly Putri", icon: "🏐", color: "#e11d48", totalTeams: 12, totalGroups: 4 },

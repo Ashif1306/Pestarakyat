@@ -56,7 +56,7 @@ export default function TentangPage() {
           </div>
           <h3 className="text-lg font-bold text-white">KKN IAIN Parepare</h3>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Diselenggarakan oleh mahasiswa KKN IAIN Parepare Angkatan X Posko Dusun Bala Batu sebagai sarana mempererat silaturahmi & kebersamaan warga.
+            PANITIA PELAKSANA PESTA RAKYAT KKN IAIN PAREPARE POSKO 03 ANGKATAN 37 DESA BUNTU BARANA KOLABORASI PEMUDA BALABATU
           </p>
         </div>
 
