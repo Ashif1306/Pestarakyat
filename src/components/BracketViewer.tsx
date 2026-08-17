@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Download, Trophy, MoveHorizontal, Info, X, Calendar, Loader2, CheckCircle2 } from 'lucide-react';
+import { Download, Trophy, MoveHorizontal, Calendar, Loader2, CheckCircle2 } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { getMatchesBySport, getStandings, fetchServerMatches, getStandingsWithMatches } from '@/lib/data';
 import type { Match, Standing, Team } from '@/types';
@@ -132,13 +132,12 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   // Tournament Winner
   const tournamentWinner = finalMatch?.status === 'finished' ? finalMatch.winner : null;
 
-  // SVG Connector Lines
+  // SVG Connector Lines (Calculated relative to SVG element rect)
   const drawLines = () => {
-    if (!containerRef.current || !svgRef.current) return;
-    const container = containerRef.current;
+    if (!svgRef.current) return;
     const svg = svgRef.current;
     svg.innerHTML = '';
-    const containerRect = container.getBoundingClientRect();
+    const svgRect = svg.getBoundingClientRect();
 
     const drawConnectorPair = (
       card1Id: string,
@@ -155,12 +154,12 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       const r2 = el2.getBoundingClientRect();
       const rt = targetEl.getBoundingClientRect();
 
-      const y1 = r1.top + r1.height / 2 - containerRect.top;
-      const x1 = r1.right - containerRect.left;
-      const y2 = r2.top + r2.height / 2 - containerRect.top;
-      const x2 = r2.right - containerRect.left;
-      const ty = rt.top + rt.height / 2 - containerRect.top;
-      const tx = rt.left - containerRect.left;
+      const y1 = r1.top + r1.height / 2 - svgRect.top;
+      const x1 = r1.right - svgRect.left;
+      const y2 = r2.top + r2.height / 2 - svgRect.top;
+      const x2 = r2.right - svgRect.left;
+      const ty = rt.top + rt.height / 2 - svgRect.top;
+      const tx = rt.left - svgRect.left;
 
       const mx = (Math.max(x1, x2) + tx) / 2;
       const midY = (y1 + y2) / 2;
@@ -171,8 +170,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
         `M ${x1} ${y1} H ${mx} ` +
         `M ${x2} ${y2} H ${mx} ` +
         `M ${mx} ${y1} V ${y2} ` +
-        `M ${mx} ${midY} V ${ty} ` +
-        `M ${mx} ${ty} H ${tx}`
+        `M ${mx} ${midY} H ${tx}`
       );
       path.setAttribute('stroke', '#38bdf8'); // Bright cyan accent
       path.setAttribute('stroke-width', '2');
@@ -236,16 +234,9 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       {/* Title & Toolbar Header */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-4 border-b border-white/[0.06] no-print">
         <div className="text-center sm:text-left space-y-1">
-          <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
-            <h2 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wider">
-              BAGAN SISTEM GUGUR
-            </h2>
-            {!isMiniFootball && (
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase tracking-wide">
-                ⚡ Babak Knockout Best of 5 Sets (5 Set)
-              </span>
-            )}
-          </div>
+          <h2 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wider">
+            BAGAN SISTEM GUGUR
+          </h2>
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
             PERTANDINGAN {sportName.toUpperCase()}
           </p>
@@ -296,17 +287,9 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
         >
           {/* Official Image Header Title (Included in Downloaded PNG Image) */}
           <div className="w-full text-center pb-4 border-b border-white/10 space-y-2 z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-extrabold uppercase tracking-widest">
-              🏆 PESTA RAKYAT X KKN IAIN PAREPARE 2026
-            </div>
             <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider">
               BAGAN SISTEM GUGUR - PERTANDINGAN {sportName.toUpperCase()}
             </h2>
-            {!isMiniFootball && (
-              <div className="text-xs font-extrabold text-amber-400 uppercase tracking-widest">
-                ⚡ BABAK KNOCKOUT BEST OF 5 SETS (FORMAT 5 SET)
-              </div>
-            )}
             <p className="text-[10px] text-slate-400 font-semibold tracking-wide max-w-2xl mx-auto uppercase">
               PANITIA PELAKSANA PESTA RAKYAT KKN IAIN PAREPARE POSKO 03 ANGKATAN 37 DESA BUNTU BARANA KOLABORASI PEMUDA BALABATU
             </p>
@@ -324,7 +307,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                 {!isMiniFootball && (
                   <div className="flex flex-col gap-6 w-56 sm:w-64 flex-shrink-0">
                     <div className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-widest text-center">
-                      PEREMPAT FINAL (5 SET)
+                      PEREMPAT FINAL
                     </div>
 
                     {/* QF 0 */}
@@ -337,7 +320,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                 {/* SF 0 */}
                 <div className="flex flex-col justify-center w-56 sm:w-64 flex-shrink-0">
                   <div className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-widest text-center mb-2">
-                    SEMI FINAL {!isMiniFootball ? '(5 SET)' : ''}
+                    SEMI FINAL
                   </div>
                   {renderMatchCard(sfMatches[0], sfPairs[0], 'sf-0', sfPairs[0][0] === 'TBD', sfPairs[0][1] === 'TBD')}
                 </div>
@@ -365,7 +348,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
             {/* FINAL ROUND (Centered Right) */}
             <div className="relative z-10 flex flex-col justify-center w-56 sm:w-64 flex-shrink-0 self-center space-y-4">
               <div className="text-[11px] font-extrabold text-amber-400 uppercase tracking-widest text-center mb-2">
-                FINAL {!isMiniFootball ? '(5 SET)' : ''}
+                FINAL
               </div>
 
               <div
