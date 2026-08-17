@@ -391,22 +391,35 @@ export default function AdminDashboardPage() {
                     className="bg-[#0a1628] border border-slate-700/60 rounded px-2 py-1 text-slate-400 text-[11px] w-full outline-none focus:border-cyan-500" placeholder="Lokasi" />
                 </div>
 
-                {/* Teams + Scores */}
-                <div className="md:col-span-6 grid grid-cols-7 items-center gap-2 bg-[#0a1628] p-3 rounded-xl border border-white/5">
-                  <div className="col-span-3 text-right">
+                {/* Teams + Scores (Mobile Friendly & Non-Overlapping Layout) */}
+                <div className="md:col-span-6 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 bg-[#0a1628] p-3 rounded-xl border border-white/5">
+                  {/* Team A */}
+                  <div className="w-full sm:flex-1">
+                    <label className="text-[10px] text-slate-400 font-bold block sm:hidden mb-1 text-left">Tim A</label>
                     <input type="text" value={match.teamA} onChange={e => handleMatchChange(match.id, 'teamA', e.target.value)}
-                      className="bg-[#0f1d32] border border-slate-700 rounded px-2 py-1 text-white font-bold text-xs text-right w-full outline-none focus:border-red-500" />
+                      className="bg-[#0f1d32] border border-slate-700 rounded px-2.5 py-1.5 text-white font-bold text-xs text-left sm:text-right w-full outline-none focus:border-red-500 transition-colors" placeholder="Nama Tim A" />
                   </div>
-                  <div className="col-span-1 flex items-center justify-center gap-1">
-                    <input type="number" min="0" value={match.scoreA ?? ''} onChange={e => handleMatchChange(match.id, 'scoreA', e.target.value === '' ? null : parseInt(e.target.value))}
-                      className="w-10 text-center bg-slate-800 border border-slate-700 rounded text-white font-extrabold text-sm py-1 outline-none focus:border-red-500" placeholder="0" />
-                    <span className="text-slate-500 text-xs font-bold">-</span>
-                    <input type="number" min="0" value={match.scoreB ?? ''} onChange={e => handleMatchChange(match.id, 'scoreB', e.target.value === '' ? null : parseInt(e.target.value))}
-                      className="w-10 text-center bg-slate-800 border border-slate-700 rounded text-white font-extrabold text-sm py-1 outline-none focus:border-red-500" placeholder="0" />
+
+                  {/* Score A & B Pill (Centered, Dedicated Box, Zero Overlap) */}
+                  <div className="flex items-center justify-center gap-2 px-3 py-1.5 bg-[#0f1d32] border border-slate-700/80 rounded-xl flex-shrink-0 w-full sm:w-auto shadow-inner">
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] font-extrabold text-slate-400 uppercase sm:hidden">Skor A:</span>
+                      <input type="number" min="0" value={match.scoreA ?? ''} onChange={e => handleMatchChange(match.id, 'scoreA', e.target.value === '' ? null : parseInt(e.target.value))}
+                        className="w-10 text-center bg-slate-800 border border-slate-700 rounded text-white font-black text-sm py-1 outline-none focus:border-red-500" placeholder="0" />
+                    </div>
+                    <span className="text-slate-500 font-black text-sm text-center px-1">-</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] font-extrabold text-slate-400 uppercase sm:hidden">Skor B:</span>
+                      <input type="number" min="0" value={match.scoreB ?? ''} onChange={e => handleMatchChange(match.id, 'scoreB', e.target.value === '' ? null : parseInt(e.target.value))}
+                        className="w-10 text-center bg-slate-800 border border-slate-700 rounded text-white font-black text-sm py-1 outline-none focus:border-red-500" placeholder="0" />
+                    </div>
                   </div>
-                  <div className="col-span-3 text-left">
+
+                  {/* Team B */}
+                  <div className="w-full sm:flex-1">
+                    <label className="text-[10px] text-slate-400 font-bold block sm:hidden mb-1 text-left">Tim B</label>
                     <input type="text" value={match.teamB} onChange={e => handleMatchChange(match.id, 'teamB', e.target.value)}
-                      className="bg-[#0f1d32] border border-slate-700 rounded px-2 py-1 text-white font-bold text-xs text-left w-full outline-none focus:border-red-500" />
+                      className="bg-[#0f1d32] border border-slate-700 rounded px-2.5 py-1.5 text-white font-bold text-xs text-left w-full outline-none focus:border-red-500 transition-colors" placeholder="Nama Tim B" />
                   </div>
                 </div>
 
