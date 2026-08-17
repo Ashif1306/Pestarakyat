@@ -247,16 +247,9 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       {/* Title & Toolbar Header */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-4 border-b border-white/[0.06] no-print">
         <div className="text-center sm:text-left space-y-1">
-          <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
-            <h2 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wider">
-              BAGAN SISTEM GUGUR
-            </h2>
-            {!isMiniFootball && (
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase tracking-wide">
-                ⚡ 5 Set
-              </span>
-            )}
-          </div>
+          <h2 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wider">
+            BAGAN SISTEM GUGUR
+          </h2>
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
             PERTANDINGAN {sportName.toUpperCase()}
           </p>
@@ -301,23 +294,16 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       <div className="overflow-x-auto custom-scrollbar pb-6 pt-2">
         <div
           ref={containerRef}
-          className={`relative flex flex-col items-center justify-center gap-6 px-6 py-6 bg-[#0f1d32] ${
+          className={`bracket-canvas relative flex flex-col items-center justify-center gap-6 px-6 py-6 rounded-2xl border border-white/10 ${
             isMiniFootball ? 'min-w-[560px]' : 'min-w-[860px]'
           }`}
         >
           {/* Official Image Header Title (Included in Downloaded PNG Image) */}
           <div className="w-full text-center pb-4 border-b border-white/10 space-y-2 z-10">
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <h2 style={{ color: '#ffffff' }} className="text-xl sm:text-2xl font-black uppercase tracking-wider">
-                BAGAN SISTEM GUGUR - PERTANDINGAN {sportName.toUpperCase()}
-              </h2>
-              {!isMiniFootball && (
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40 uppercase tracking-wider">
-                  ⚡ 5 SET
-                </span>
-              )}
-            </div>
-            <p style={{ color: '#94a3b8' }} className="text-[10px] font-semibold tracking-wide max-w-2xl mx-auto uppercase">
+            <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider">
+              BAGAN SISTEM GUGUR - PERTANDINGAN {sportName.toUpperCase()}
+            </h2>
+            <p className="text-[10px] font-semibold tracking-wide max-w-2xl mx-auto uppercase">
               PANITIA PELAKSANA PESTA RAKYAT KKN IAIN PAREPARE POSKO 03 ANGKATAN 37 DESA BUNTU BARANA KOLABORASI PEMUDA BALABATU
             </p>
           </div>
