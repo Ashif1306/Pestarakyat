@@ -197,12 +197,20 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
     };
   }, [matches, standings, isMiniFootball]);
 
-  // Image Download Handler
+  // Image Download Handler (High Contrast in both Dark and Light mode)
   const handleDownloadImage = async () => {
     if (!containerRef.current) return;
+    const isLightMode = document.documentElement.classList.contains('light');
+
     try {
       setDownloading(true);
       setDownloadSuccess(false);
+
+      // Temporarily remove light mode class during PNG capture to prevent black text overrides on dark canvas
+      if (isLightMode) {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+      }
 
       // Redraw lines to ensure crisp positioning
       drawLines();
@@ -225,6 +233,11 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       console.error('Error downloading bracket image:', err);
       alert('Gagal mengunduh gambar bagan. Silakan coba beberapa saat lagi!');
     } finally {
+      // Restore original theme class
+      if (isLightMode) {
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
+      }
       setDownloading(false);
     }
   };
@@ -287,10 +300,10 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
         >
           {/* Official Image Header Title (Included in Downloaded PNG Image) */}
           <div className="w-full text-center pb-4 border-b border-white/10 space-y-2 z-10">
-            <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider">
+            <h2 style={{ color: '#ffffff' }} className="text-xl sm:text-2xl font-black uppercase tracking-wider">
               BAGAN SISTEM GUGUR - PERTANDINGAN {sportName.toUpperCase()}
             </h2>
-            <p className="text-[10px] text-slate-400 font-semibold tracking-wide max-w-2xl mx-auto uppercase">
+            <p style={{ color: '#94a3b8' }} className="text-[10px] font-semibold tracking-wide max-w-2xl mx-auto uppercase">
               PANITIA PELAKSANA PESTA RAKYAT KKN IAIN PAREPARE POSKO 03 ANGKATAN 37 DESA BUNTU BARANA KOLABORASI PEMUDA BALABATU
             </p>
           </div>
