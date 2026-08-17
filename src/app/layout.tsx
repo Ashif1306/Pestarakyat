@@ -109,7 +109,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="id" className={`${inter.variable} ${outfit.variable}`}>
+    <html lang="id" className={`dark ${inter.variable} ${outfit.variable}`}>
       <head>
         <script
           type="application/ld+json"

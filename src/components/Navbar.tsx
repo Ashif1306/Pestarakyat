@@ -19,30 +19,51 @@ export default function Navbar() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    const savedTheme = (localStorage.getItem('pr_theme') as 'dark' | 'light') || 'dark';
-    setTheme(savedTheme);
-    if (savedTheme === 'light') {
+  const applyTheme = (t: 'dark' | 'light') => {
+    setTheme(t);
+    if (t === 'light') {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
     } else {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
+    }
+  };
+
+  useEffect(() => {
+    setMounted(true);
+    // 1. Check if user manually saved a preference in localStorage
+    const savedTheme = localStorage.getItem('pr_theme') as 'dark' | 'light' | null;
+
+    let initialTheme: 'dark' | 'light' = 'dark';
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      initialTheme = savedTheme;
+    } else {
+      // 2. Otherwise automatically follow user's active device theme (prefers-color-scheme)
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      initialTheme = prefersDark ? 'dark' : 'light';
+    }
+
+    applyTheme(initialTheme);
+
+    // 3. Listen to live system theme mode changes if user hasn't explicitly locked a preference
+    if (window.matchMedia) {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleDeviceThemeChange = (e: MediaQueryListEvent) => {
+        if (!localStorage.getItem('pr_theme')) {
+          applyTheme(e.matches ? 'dark' : 'light');
+        }
+      };
+
+      mediaQuery.addEventListener('change', handleDeviceThemeChange);
+      return () => mediaQuery.removeEventListener('change', handleDeviceThemeChange);
     }
   }, []);
 
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(nextTheme);
     localStorage.setItem('pr_theme', nextTheme);
-    if (nextTheme === 'light') {
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    }
+    applyTheme(nextTheme);
   };
 
   const isActive = (href: string) => {
