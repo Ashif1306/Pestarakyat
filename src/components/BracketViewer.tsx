@@ -247,9 +247,16 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       {/* Title & Toolbar Header */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-4 border-b border-white/[0.06] no-print">
         <div className="text-center sm:text-left space-y-1">
-          <h2 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wider">
-            BAGAN SISTEM GUGUR
-          </h2>
+          <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
+            <h2 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wider">
+              BAGAN SISTEM GUGUR
+            </h2>
+            {!isMiniFootball && (
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase tracking-wide">
+                ⚡ 5 Set
+              </span>
+            )}
+          </div>
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
             PERTANDINGAN {sportName.toUpperCase()}
           </p>
@@ -300,9 +307,16 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
         >
           {/* Official Image Header Title (Included in Downloaded PNG Image) */}
           <div className="w-full text-center pb-4 border-b border-white/10 space-y-2 z-10">
-            <h2 style={{ color: '#ffffff' }} className="text-xl sm:text-2xl font-black uppercase tracking-wider">
-              BAGAN SISTEM GUGUR - PERTANDINGAN {sportName.toUpperCase()}
-            </h2>
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <h2 style={{ color: '#ffffff' }} className="text-xl sm:text-2xl font-black uppercase tracking-wider">
+                BAGAN SISTEM GUGUR - PERTANDINGAN {sportName.toUpperCase()}
+              </h2>
+              {!isMiniFootball && (
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40 uppercase tracking-wider">
+                  ⚡ 5 SET
+                </span>
+              )}
+            </div>
             <p style={{ color: '#94a3b8' }} className="text-[10px] font-semibold tracking-wide max-w-2xl mx-auto uppercase">
               PANITIA PELAKSANA PESTA RAKYAT KKN IAIN PAREPARE POSKO 03 ANGKATAN 37 DESA BUNTU BARANA KOLABORASI PEMUDA BALABATU
             </p>
@@ -320,7 +334,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                 {!isMiniFootball && (
                   <div className="flex flex-col gap-6 w-56 sm:w-64 flex-shrink-0">
                     <div className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-widest text-center">
-                      PEREMPAT FINAL
+                      PEREMPAT FINAL (5 SET)
                     </div>
 
                     {/* QF 0 */}
@@ -333,7 +347,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
                 {/* SF 0 */}
                 <div className="flex flex-col justify-center w-56 sm:w-64 flex-shrink-0">
                   <div className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-widest text-center mb-2">
-                    SEMI FINAL
+                    SEMI FINAL {!isMiniFootball ? '(5 SET)' : ''}
                   </div>
                   {renderMatchCard(sfMatches[0], sfPairs[0], 'sf-0', sfPairs[0][0] === 'TBD', sfPairs[0][1] === 'TBD')}
                 </div>
@@ -361,7 +375,7 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
             {/* FINAL ROUND (Centered Right) */}
             <div className="relative z-10 flex flex-col justify-center w-56 sm:w-64 flex-shrink-0 self-center space-y-4">
               <div className="text-[11px] font-extrabold text-amber-400 uppercase tracking-widest text-center mb-2">
-                FINAL
+                FINAL {!isMiniFootball ? '(5 SET)' : ''}
               </div>
 
               <div
