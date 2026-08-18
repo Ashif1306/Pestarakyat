@@ -128,11 +128,18 @@ export default function AdminDashboardPage() {
     setMatches(prev => prev.map(m => {
       if (m.id !== id) return m;
       const updated = { ...m, [field]: val };
-      if (updated.scoreA !== null && updated.scoreB !== null) {
-        if (updated.scoreA > updated.scoreB) updated.winner = updated.teamA;
-        else if (updated.scoreB > updated.scoreA) updated.winner = updated.teamB;
+      if (updated.scoreA !== null && updated.scoreB !== null && updated.scoreA !== undefined && updated.scoreB !== undefined && String(updated.scoreA) !== '' && String(updated.scoreB) !== '') {
+        const sa = Number(updated.scoreA);
+        const sb = Number(updated.scoreB);
+        if (sa > sb) updated.winner = updated.teamA;
+        else if (sb > sa) updated.winner = updated.teamB;
         else updated.winner = null;
-      } else { updated.winner = null; }
+        updated.status = 'finished';
+      } else {
+        if (field === 'scoreA' || field === 'scoreB') {
+          updated.winner = null;
+        }
+      }
       return updated;
     }));
   };

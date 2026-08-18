@@ -84,20 +84,38 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
     return defaultPlaceholder;
   };
 
+  // Helper: Get match winner (resilient to status, scores, or winner column)
+  const getMatchWinner = (m?: Match) => {
+    if (!m) return null;
+    if (m.winner && m.winner.trim()) return m.winner.trim();
+    if (m.scoreA !== null && m.scoreB !== null && m.scoreA !== undefined && m.scoreB !== undefined) {
+      const sa = Number(m.scoreA);
+      const sb = Number(m.scoreB);
+      if (sa > sb && m.teamA) return m.teamA.trim();
+      if (sb > sa && m.teamB) return m.teamB.trim();
+    }
+    return null;
+  };
+
   // QF Pairings (Exact diagram match for Volly)
-  const qfPairs: [string, string][] = [
+  const rawQfPairs: [string, string][] = [
     [getQFTeam(0, true, 'Juara Full A', leaderA), getQFTeam(0, false, 'Runner Up B', runnerB)],
     [getQFTeam(1, true, 'Juara Full C', leaderC), getQFTeam(1, false, 'Runner Up D', runnerD)],
     [getQFTeam(2, true, 'Juara Full B', leaderB), getQFTeam(2, false, 'Runner Up C', runnerC)],
     [getQFTeam(3, true, 'Juara Full D', leaderD), getQFTeam(3, false, 'Runner Up A', runnerA)],
   ];
 
-  // Check QF Winners
-  const qfWinners = qfPairs.map((pair, idx) => {
-    const m = qfMatches[idx];
-    if (m?.status === 'finished' && m.winner) return m.winner;
-    return null;
+  // Prevent duplicate team playing against itself in QF
+  const qfPairs = rawQfPairs.map(([tA, tB]) => {
+    if (tA && tB && tA.trim().toLowerCase() === tB.trim().toLowerCase()) {
+      const altB = runnerA !== tA ? runnerA : (runnerB !== tA ? runnerB : 'TBD');
+      return [tA, altB] as [string, string];
+    }
+    return [tA, tB] as [string, string];
   });
+
+  // Check QF Winners (If match has a winner or score, advance winner to Semi Final!)
+  const qfWinners = qfMatches.map((m) => getMatchWinner(m));
 
   // SF Pairings
   let sfPairs: [string, string][] = [];
@@ -107,10 +125,10 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
       [getQFTeam(1, true, 'Juara Full B', leaderB), getQFTeam(1, false, 'Runner Up A', runnerA)],
     ];
   } else {
-    const sf1A = isRealTeam(sfMatches[0]?.teamA) ? sfMatches[0].teamA : (qfWinners[0] || 'TBD');
-    const sf1B = isRealTeam(sfMatches[0]?.teamB) ? sfMatches[0].teamB : (qfWinners[1] || 'TBD');
-    const sf2A = isRealTeam(sfMatches[1]?.teamA) ? sfMatches[1].teamA : (qfWinners[2] || 'TBD');
-    const sf2B = isRealTeam(sfMatches[1]?.teamB) ? sfMatches[1].teamB : (qfWinners[3] || 'TBD');
+    const sf1A = qfWinners[0] || (isRealTeam(sfMatches[0]?.teamA) ? sfMatches[0].teamA : 'TBD');
+    const sf1B = qfWinners[1] || (isRealTeam(sfMatches[0]?.teamB) ? sfMatches[0].teamB : 'TBD');
+    const sf2A = qfWinners[2] || (isRealTeam(sfMatches[1]?.teamA) ? sfMatches[1].teamA : 'TBD');
+    const sf2B = qfWinners[3] || (isRealTeam(sfMatches[1]?.teamB) ? sfMatches[1].teamB : 'TBD');
 
     sfPairs = [
       [sf1A, sf1B],
@@ -119,20 +137,16 @@ export default function BracketViewer({ sportId = 'volly-putra', sportName }: Br
   }
 
   // Check SF Winners
-  const sfWinners = sfPairs.map((pair, idx) => {
-    const m = sfMatches[idx];
-    if (m?.status === 'finished' && m.winner) return m.winner;
-    return null;
-  });
+  const sfWinners = sfMatches.map((m) => getMatchWinner(m));
 
   // Final Pair
-  const finalA = finalMatch?.teamA && isRealTeam(finalMatch.teamA) ? finalMatch.teamA : (sfWinners[0] || 'TBD');
-  const finalB = finalMatch?.teamB && isRealTeam(finalMatch.teamB) ? finalMatch.teamB : (sfWinners[1] || 'TBD');
+  const finalA = sfWinners[0] || (finalMatch?.teamA && isRealTeam(finalMatch.teamA) ? finalMatch.teamA : 'TBD');
+  const finalB = sfWinners[1] || (finalMatch?.teamB && isRealTeam(finalMatch.teamB) ? finalMatch.teamB : 'TBD');
 
   const finalPair: [string, string] = [finalA, finalB];
 
   // Tournament Winner
-  const tournamentWinner = finalMatch?.status === 'finished' ? finalMatch.winner : null;
+  const tournamentWinner = getMatchWinner(finalMatch);
 
   // SVG Connector Lines (Calculated relative to SVG element rect)
   const drawLines = () => {
