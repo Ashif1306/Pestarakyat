@@ -1335,7 +1335,7 @@ export function getResolvedMatchesForList(matches: Match[], forceSync: boolean =
         teamB = forceSync || !isRealTeam(m.teamB) ? runnerC : m.teamB;
       } else if (m.id.endsWith('qf4')) {
         teamA = forceSync || !isRealTeam(m.teamA) ? leaderD : m.teamA;
-        teamB = forceSync || !isRealTeam(m.teamB) ? runnerA : m.teamA;
+        teamB = forceSync || !isRealTeam(m.teamB) ? runnerA : m.teamB;
       }
     } else if (roundLower.includes('semi') || m.id.includes('-sf')) {
       if (s === 'sepak-bola-mini') {
