@@ -1385,16 +1385,16 @@ export function getResolvedMatchesForList(matches: Match[], forceSync: boolean =
         }
       } else {
         if (m.id.endsWith('sf1')) {
-          teamA = qfW.qf1 || (forceSync || !isRealTeam(m.teamA) ? 'Pemenang QF 1' : m.teamA);
-          teamB = qfW.qf2 || (forceSync || !isRealTeam(m.teamB) ? 'Pemenang QF 2' : m.teamB);
+          teamA = qfW.qf1 || (forceSync || !isRealTeam(m.teamA) ? 'TBD' : m.teamA);
+          teamB = qfW.qf2 || (forceSync || !isRealTeam(m.teamB) ? 'TBD' : m.teamB);
         } else if (m.id.endsWith('sf2')) {
-          teamA = qfW.qf3 || (forceSync || !isRealTeam(m.teamA) ? 'Pemenang QF 3' : m.teamA);
-          teamB = qfW.qf4 || (forceSync || !isRealTeam(m.teamB) ? 'Pemenang QF 4' : m.teamB);
+          teamA = qfW.qf3 || (forceSync || !isRealTeam(m.teamA) ? 'TBD' : m.teamA);
+          teamB = qfW.qf4 || (forceSync || !isRealTeam(m.teamB) ? 'TBD' : m.teamB);
         }
       }
     } else if (roundLower.includes('final') || m.id.includes('-f')) {
-      teamA = sfW.sf1 || (forceSync || !isRealTeam(m.teamA) ? 'Pemenang SF 1' : m.teamA);
-      teamB = sfW.sf2 || (forceSync || !isRealTeam(m.teamB) ? 'Pemenang SF 2' : m.teamB);
+      teamA = sfW.sf1 || (forceSync || !isRealTeam(m.teamA) ? 'TBD' : m.teamA);
+      teamB = sfW.sf2 || (forceSync || !isRealTeam(m.teamB) ? 'TBD' : m.teamB);
     }
 
     return {
