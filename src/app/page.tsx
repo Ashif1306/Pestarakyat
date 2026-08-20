@@ -193,8 +193,8 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {todayScheduled.length === 0 ? (
-          /* REST DAY (HARI INI LIBUR) CARD */
+        {todayMatches.length === 0 ? (
+          /* REST DAY (MEMANG TIDAK ADA JADWAL HARI INI) CARD */
           <div className="bg-white dark:bg-gradient-to-br dark:from-[#0f1d32] dark:via-[#0a1628] dark:to-[#0f1d32] rounded-3xl border border-amber-500/40 p-8 sm:p-12 text-center space-y-6 shadow-xl shadow-amber-500/10 relative overflow-hidden transition-colors">
             <div className="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -226,6 +226,31 @@ export default function HomePage() {
               >
                 Lihat Hasil Pertandingan Kemarin
               </Link>
+            </div>
+          </div>
+        ) : todayScheduled.length === 0 && todayFinished.length > 0 ? (
+          /* SEMUA PERTANDINGAN HARI INI SELESAI -> TAMPILKAN HASIL SKOR HARI INI */
+          <div className="space-y-6">
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 text-emerald-400 shadow-lg shadow-emerald-500/5">
+              <div className="flex items-center gap-3">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                </span>
+                <div>
+                  <h4 className="font-extrabold text-sm text-white">Semua Pertandingan Hari Ini Telah Selesai! 🎉</h4>
+                  <p className="text-xs text-slate-400">Seluruh hasil skor pertandingan hari ini ({todayWitaDate}) telah diperbarui secara resmi.</p>
+                </div>
+              </div>
+              <span className="text-xs font-extrabold text-emerald-400 bg-emerald-500/20 px-3.5 py-1.5 rounded-full border border-emerald-500/40">
+                {todayFinished.length} Match Selesai
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {todayFinished.map((match) => (
+                <MatchCard key={match.id} match={match} />
+              ))}
             </div>
           </div>
         ) : (

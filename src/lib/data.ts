@@ -1299,6 +1299,40 @@ export function getResolvedMatchesForList(matches: Match[], forceSync: boolean =
     return !lower.includes('juara') && !lower.includes('runner') && !lower.includes('pemenang') && !lower.includes('tim...') && lower !== 'tbd';
   };
 
+  const getWinnerOfMatch = (m?: Match) => {
+    if (!m) return null;
+    if (m.winner && m.winner.trim()) return m.winner.trim();
+    if (m.scoreA !== null && m.scoreB !== null && m.scoreA !== undefined && m.scoreB !== undefined) {
+      const sa = Number(m.scoreA);
+      const sb = Number(m.scoreB);
+      if (sa > sb && m.teamA) return m.teamA.trim();
+      if (sb > sa && m.teamB) return m.teamB.trim();
+    }
+    return null;
+  };
+
+  // Pre-calculate winners per sport for SF & Final resolution
+  const qfWinnersMap: Record<string, Record<string, string | null>> = {};
+  const sfWinnersMap: Record<string, Record<string, string | null>> = {};
+
+  sportsToResolve.forEach((s) => {
+    const sportMatches = matches.filter(x => x.sport === s);
+    const qfMatches = sportMatches.filter(x => x.phase === 'knockout' && x.round.toLowerCase().includes('perempat'));
+    const sfMatches = sportMatches.filter(x => x.phase === 'knockout' && x.round.toLowerCase().includes('semi'));
+
+    qfWinnersMap[s] = {
+      qf1: getWinnerOfMatch(qfMatches.find(x => x.id.endsWith('qf1'))),
+      qf2: getWinnerOfMatch(qfMatches.find(x => x.id.endsWith('qf2'))),
+      qf3: getWinnerOfMatch(qfMatches.find(x => x.id.endsWith('qf3'))),
+      qf4: getWinnerOfMatch(qfMatches.find(x => x.id.endsWith('qf4'))),
+    };
+
+    sfWinnersMap[s] = {
+      sf1: getWinnerOfMatch(sfMatches.find(x => x.id.endsWith('sf1'))),
+      sf2: getWinnerOfMatch(sfMatches.find(x => x.id.endsWith('sf2'))),
+    };
+  });
+
   return matches.map((m) => {
     if (m.phase !== 'knockout') return m;
 
@@ -1317,6 +1351,9 @@ export function getResolvedMatchesForList(matches: Match[], forceSync: boolean =
     const runnerC = groupC[1]?.name || 'Runner Up C';
     const leaderD = groupD[0]?.name || 'Juara Full D';
     const runnerD = groupD[1]?.name || 'Runner Up D';
+
+    const qfW = qfWinnersMap[s] || {};
+    const sfW = sfWinnersMap[s] || {};
 
     let teamA = m.teamA;
     let teamB = m.teamB;
@@ -1346,7 +1383,18 @@ export function getResolvedMatchesForList(matches: Match[], forceSync: boolean =
           teamA = forceSync || !isRealTeam(m.teamA) ? leaderB : m.teamA;
           teamB = forceSync || !isRealTeam(m.teamB) ? runnerA : m.teamB;
         }
+      } else {
+        if (m.id.endsWith('sf1')) {
+          teamA = qfW.qf1 || (forceSync || !isRealTeam(m.teamA) ? 'Pemenang QF 1' : m.teamA);
+          teamB = qfW.qf2 || (forceSync || !isRealTeam(m.teamB) ? 'Pemenang QF 2' : m.teamB);
+        } else if (m.id.endsWith('sf2')) {
+          teamA = qfW.qf3 || (forceSync || !isRealTeam(m.teamA) ? 'Pemenang QF 3' : m.teamA);
+          teamB = qfW.qf4 || (forceSync || !isRealTeam(m.teamB) ? 'Pemenang QF 4' : m.teamB);
+        }
       }
+    } else if (roundLower.includes('final') || m.id.includes('-f')) {
+      teamA = sfW.sf1 || (forceSync || !isRealTeam(m.teamA) ? 'Pemenang SF 1' : m.teamA);
+      teamB = sfW.sf2 || (forceSync || !isRealTeam(m.teamB) ? 'Pemenang SF 2' : m.teamB);
     }
 
     return {
